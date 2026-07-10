@@ -1,0 +1,24 @@
+import { IUser } from "@/modules/users/users.interface";
+import { Types } from "mongoose";
+
+export type IJWtPayload = {
+  id: string | Types.ObjectId;
+  email: string;
+  role: string;
+};
+
+export type ILoginResponse = {
+  access_token: string;
+  refresh_token: string;
+  user: IUser;
+};
+
+export type ILoginPayload = {
+  email: string;
+  password: string;
+};
+
+export type IGenericErrorMessage = {
+  path: string | number;
+  message: string;
+};
