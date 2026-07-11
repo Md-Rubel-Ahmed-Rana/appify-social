@@ -17,7 +17,15 @@ const authApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["auth"],
     }),
+    logout: build.mutation({
+      query: () => ({
+        url: `/auth/logout`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["auth"],
+    }),
   }),
 });
 
-export const { useGetUserProfileQuery, useLoginMutation } = authApi;
+export const { useGetUserProfileQuery, useLoginMutation, useLogoutMutation } =
+  authApi;

@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
+import LogoutButton from "../common/logout-button";
 
 const AppNavbar = () => {
   const { data, isLoading, isError } = useGetUserProfileQuery({});
@@ -90,7 +91,7 @@ const AppNavbar = () => {
               <DropdownMenuSeparator />
 
               <DropdownMenuItem className="text-red-600">
-                Logout
+                <LogoutButton />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
