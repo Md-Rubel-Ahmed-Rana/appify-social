@@ -3,6 +3,8 @@ import { Types } from "mongoose";
 
 export type IJWtPayload = {
   id: string | Types.ObjectId;
+  first_name: string;
+  last_name: string;
   email: string;
   role: string;
 };

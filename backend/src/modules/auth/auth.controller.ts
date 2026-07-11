@@ -7,7 +7,12 @@ import { ILoginResponse } from "@/interfaces/common.interface";
 
 class Controller extends BaseController {
   register = this.catchAsync(async (req: Request, res: Response) => {
-    const user = await AuthService.register(req.body);
+    const { user, access_token, refresh_token } = await AuthService.register(
+      req.body
+    );
+
+    cookieManager.setTokens(res, access_token, refresh_token);
+
     this.sendResponse(res, {
       statusCode: HttpStatusCode.CREATED,
       success: true,

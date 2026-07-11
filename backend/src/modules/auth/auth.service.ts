@@ -5,20 +5,29 @@ import ApiError from "@/middlewares/error";
 import { Types } from "mongoose";
 import { JwtInstance } from "@/lib/jwt";
 import { HttpStatusCode } from "@/lib/httpStatus";
-import { ILoginPayload, ILoginResponse } from "@/interfaces/common.interface";
+import {
+  IJWtPayload,
+  ILoginPayload,
+  ILoginResponse,
+} from "@/interfaces/common.interface";
 
 class Service {
   async register(data: IUser) {
     data.password = await BcryptInstance.hash(data.password);
 
-    await UserService.create(data);
+    const user = await UserService.create(data);
+
+    return await this.generateAuthResponse(user);
   }
 
-  async login(data: ILoginPayload): Promise<ILoginResponse> {
+  async login(data: ILoginPayload) {
     const user = await UserService.getUserByEmailWithPassword(data.email);
 
     if (!user) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "Invalid credentials");
+      throw new ApiError(
+        HttpStatusCode.UNAUTHORIZED,
+        "Invalid email or password"
+      );
     }
 
     const isPasswordMatched = await BcryptInstance.compare(
@@ -29,37 +38,49 @@ class Service {
     if (!isPasswordMatched) {
       throw new ApiError(
         HttpStatusCode.UNAUTHORIZED,
-        "Invalid credentials. Please try with valid credentials"
+        "Invalid email or password."
       );
     }
 
-    return await this.generateLoginCredentials(user._id as Types.ObjectId);
+    return await this.generateAuthResponse(user);
   }
 
-  async getLoggedInUser(id: string) {
+  async getLoggedInUser(id: Types.ObjectId) {
     const user = await UserService.getUserByIdWithoutPassword(id);
 
-    // sanitize user data
-    return user;
+    return {
+      id: user.id || user._id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      avatar_url: user.avatar_url,
+      bio: user.bio,
+    };
   }
 
-  async generateLoginCredentials(
-    id: Types.ObjectId | string
-  ): Promise<ILoginResponse> {
-    const user: any = await UserService.getUserByIdWithoutPassword(id);
-
-    const payload: any = {
-      id: user?._id.toString(),
-      role: user?.role as string,
+  private async generateAuthResponse(user: IUser) {
+    const jwtPayload: IJWtPayload = {
+      id: user._id,
+      first_name: user.first_name,
+      last_name: user.last_name,
       email: user.email,
+      role: user.role,
     };
+
     const { access_token, refresh_token } =
-      await JwtInstance.generateTokens(payload);
+      await JwtInstance.generateTokens(jwtPayload);
 
     return {
-      user: user,
-      access_token,
-      refresh_token,
+      user: {
+        id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        avatar_url: user.avatar_url,
+        bio: user.bio,
+      },
+      access_token: `Bearer ${access_token}`,
+      refresh_token: `Bearer ${refresh_token}`,
     };
   }
 }

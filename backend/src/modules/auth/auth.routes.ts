@@ -2,18 +2,24 @@ import { Router } from "express";
 import { AuthController } from "./auth.controller";
 import { JwtInstance } from "@/lib/jwt";
 import validateRequest from "@/middlewares/validateRequest";
-import { UserValidations } from "../users/users.validate";
+import { AuthValidations } from "./auth.validate";
 
 const router = Router();
 
 router.post(
   "/register",
-  validateRequest(UserValidations.create),
+  validateRequest(AuthValidations.register),
   AuthController.register
+);
+
+router.post(
+  "/login",
+  validateRequest(AuthValidations.login),
+  AuthController.login
 );
 
 router.get("/me", JwtInstance.authenticate(), AuthController.getLoggedInUser);
 
-router.post("/login", AuthController.login);
+router.delete("/logout", JwtInstance.authenticate(), AuthController.logout);
 
 export const AuthRoutes = router;

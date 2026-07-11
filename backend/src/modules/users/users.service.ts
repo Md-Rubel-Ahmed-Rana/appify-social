@@ -21,7 +21,7 @@ class Service {
     return result;
   }
 
-  async getLoggedInUser(id: string) {
+  async getLoggedInUser(id: Types.ObjectId) {
     const user = await UserModel.findById(id).select({ password: 0 });
 
     if (!user) {
@@ -31,7 +31,7 @@ class Service {
     return user;
   }
 
-  async getUserByIdWithPassword(id: string | Types.ObjectId) {
+  async getUserByIdWithPassword(id: Types.ObjectId) {
     const user = await UserModel.findById(id);
     if (!user) {
       throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
@@ -40,14 +40,10 @@ class Service {
   }
 
   async getUserByEmailWithPassword(email: string) {
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "Invalid credentials");
-    }
-    return user;
+    return await UserModel.findOne({ email }).select("+password");
   }
 
-  async getUserByIdWithoutPassword(id: string | Types.ObjectId) {
+  async getUserByIdWithoutPassword(id: Types.ObjectId) {
     const user = await UserModel.findById(id).select({ password: 0 });
     if (!user) {
       throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");

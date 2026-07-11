@@ -54,7 +54,7 @@ class JWT {
 
   authenticate(allowedRoles?: string[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { access_token, refresh_token } = this.extractTokens(req, "header");
+      const { access_token, refresh_token } = this.extractTokens(req, "cookie");
 
       if (!access_token && !refresh_token) {
         return next(
@@ -123,42 +123,6 @@ class JWT {
     };
   }
 
-  async verifyEmailVerificationToken(token: string) {
-    if (!token) {
-      throw new ApiError(
-        HttpStatusCode.BAD_REQUEST,
-        "Verification token is required"
-      );
-    }
-
-    try {
-      // Decode and verify token using the app's JWT secret
-      const decoded = jwt.verify(token, envConfig.jwt.secret) as JwtPayload;
-
-      // Return decoded data for further use (e.g., user ID, email, etc.)
-      return decoded;
-    } catch (error) {
-      if (error instanceof TokenExpiredError) {
-        throw new ApiError(
-          HttpStatusCode.UNAUTHORIZED,
-          "Your verification link has expired. Please request a new one."
-        );
-      }
-
-      if (error instanceof JsonWebTokenError) {
-        throw new ApiError(
-          HttpStatusCode.UNAUTHORIZED,
-          "Invalid or malformed verification token"
-        );
-      }
-
-      throw new ApiError(
-        HttpStatusCode.INTERNAL_SERVER_ERROR,
-        "Failed to verify email token"
-      );
-    }
-  }
-
   private extractTokens(
     req: Request,
     sourceType: "cookie" | "header"
@@ -166,19 +130,36 @@ class JWT {
     access_token: string | undefined;
     refresh_token: string | undefined;
   } {
-    let access_token = undefined;
-    let refresh_token = undefined;
+    let raw_access_token: string | undefined = undefined;
+    let raw_refresh_token: string | undefined = undefined;
 
     if (sourceType === "cookie") {
-      access_token = req.cookies[envConfig.jwt.access_cookie_name] || undefined;
-      refresh_token =
+      raw_access_token =
+        req.cookies[envConfig.jwt.access_cookie_name] || undefined;
+      raw_refresh_token =
         req.cookies[envConfig.jwt.refresh_cookie_name] || undefined;
     } else if (sourceType === "header") {
-      access_token = req.headers["authorization"] || undefined;
-      refresh_token = req.headers["x-refresh-token"] || undefined;
+      raw_access_token = req.headers["authorization"] || undefined;
+      raw_refresh_token = Array.isArray(req.headers["x-refresh-token"])
+        ? req.headers["x-refresh-token"][0]
+        : req.headers["x-refresh-token"] || undefined;
     }
 
-    console.log({ sourceType, access_token, refresh_token });
+    console.log({
+      sourceType,
+      access_token: raw_access_token,
+      refresh_token: raw_refresh_token,
+    });
+
+    const access_token =
+      raw_access_token && raw_access_token?.split(" ").length > 1
+        ? raw_access_token?.split(" ")[1]
+        : raw_access_token;
+
+    const refresh_token =
+      raw_refresh_token && raw_refresh_token?.split(" ").length > 1
+        ? raw_refresh_token?.split(" ")[1]
+        : raw_refresh_token;
 
     return { access_token, refresh_token };
   }
@@ -196,9 +177,12 @@ class JWT {
 
       const payload: IJWtPayload = {
         id: result.id,
+        first_name: result.first_name,
+        last_name: result.last_name,
         email: result?.email,
         role: result?.role,
       };
+
       const { access_token, refresh_token: new_refresh_token } =
         await this.generateTokens(payload);
       cookieManager.setTokens(res, access_token, new_refresh_token);
