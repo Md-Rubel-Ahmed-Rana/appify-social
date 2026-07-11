@@ -1,0 +1,61 @@
+import { model, Schema } from "mongoose";
+import { IPost, Visibility } from "./posts.interface";
+import { schemaOptions } from "@/utils/schemaOptions";
+
+const postSchema = new Schema<IPost>(
+  {
+    author_id: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+
+    content: {
+      type: String,
+      trim: true,
+      maxlength: 5000,
+      default: "",
+    },
+
+    visibility: {
+      type: String,
+      enum: Visibility,
+      default: Visibility.PUBLIC,
+      index: true,
+    },
+
+    like_count: {
+      type: Number,
+      default: 0,
+    },
+
+    comment_count: {
+      type: Number,
+      default: 0,
+    },
+
+    media_count: {
+      type: Number,
+      default: 0,
+    },
+
+    deleted_at: {
+      type: Date,
+      default: null,
+    },
+  },
+  schemaOptions
+);
+
+postSchema.index({
+  visibility: 1,
+  created_at: -1,
+});
+
+postSchema.index({
+  author_id: 1,
+  created_at: -1,
+});
+
+export const PostModel = model("Post", postSchema);

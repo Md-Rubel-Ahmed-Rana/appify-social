@@ -1,12 +1,15 @@
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 
-export type IUser = {
+export interface IUser {
   id: Types.ObjectId | string;
   _id: Types.ObjectId | string;
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
+  avatar_url: string;
+  bio: string;
   role: string;
   password: string;
   createdAt: Date;
   updatedAt: Date;
-} & Document;
+}
