@@ -12,12 +12,14 @@ import PasswordInput from "@/components/common/password-input";
 import { useRegisterMutation } from "@/api/auth";
 
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+
 import { SignupInput, signupSchema } from "./signup-schema";
+import CompleteProfileDialog from "@/components/common/complete-profile-dialog";
+import { useState } from "react";
 
 const SignupForm = () => {
   const [registerUser, { isLoading }] = useRegisterMutation();
-  const router = useRouter();
+  const [isSignupCompleted, setIsSignupCompleted] = useState(false);
 
   const {
     register,
@@ -40,8 +42,7 @@ const SignupForm = () => {
 
       if (result?.statusCode === 201 || result?.statusCode === 200) {
         toast.success(result?.message || "Account created successfully.");
-
-        router.replace("/");
+        setIsSignupCompleted(true);
       } else {
         toast.error(
           result?.message ?? "Failed to create account. Please try again!",
@@ -140,10 +141,10 @@ const SignupForm = () => {
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating Account...
+              Signing up...
             </>
           ) : (
-            "Create Account"
+            "Sign up"
           )}
         </Button>
 
@@ -157,6 +158,13 @@ const SignupForm = () => {
           </Link>
         </p>
       </form>
+
+      {isSignupCompleted && (
+        <CompleteProfileDialog
+          open={isSignupCompleted}
+          setOpen={setIsSignupCompleted}
+        />
+      )}
     </>
   );
 };

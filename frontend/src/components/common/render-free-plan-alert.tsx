@@ -4,11 +4,11 @@ import { Loader2, ServerCrash } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-interface Props {
+type Props = {
   open: boolean;
   onClose: () => void;
   onRetry?: () => void;
-}
+};
 
 export default function RenderColdStartDialog({
   open,
