@@ -11,11 +11,12 @@ import PasswordInput from "@/components/common/password-input";
 
 import { loginSchema, LoginInput } from "./login-schema";
 import { useLoginMutation } from "@/api/auth";
-
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
   const [login, { isLoading }] = useLoginMutation();
+  const router = useRouter();
 
   const {
     register,
@@ -27,24 +28,26 @@ const LoginForm = () => {
       email: "",
       password: "",
     },
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const handleLogin = async (values: LoginInput) => {
     try {
-      await login(values).unwrap();
-
-      toast.success("Welcome back!");
-
-      // router.replace("/")
+      const result = await login(values).unwrap();
+      console.log(result);
+      if (result?.statusCode === 200) {
+        toast.success(result?.message || "User logged in successfully");
+        router.replace("/");
+      } else {
+        toast.error(result?.message || "Failed to login. Please try again!");
+      }
     } catch (error: any) {
-      toast.error(error?.data?.message ?? "Invalid email or password.");
+      toast.error(error?.data?.message ?? "Failed to login. Please try again!");
     }
   };
 
   return (
     <>
-      {/* Heading */}
       <div className="space-y-2 text-center">
         <h2 className="text-3xl font-bold tracking-tight">Welcome Back 👋</h2>
 
@@ -53,9 +56,7 @@ const LoginForm = () => {
         </p>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit(handleLogin)} className="mt-8 space-y-6">
-        {/* Email */}
         <div className="space-y-2">
           <label htmlFor="email" className="text-sm font-medium">
             Email Address
@@ -76,7 +77,6 @@ const LoginForm = () => {
           )}
         </div>
 
-        {/* Password */}
         <div className="space-y-2">
           <PasswordInput
             isDisabled={isLoading}
@@ -86,7 +86,6 @@ const LoginForm = () => {
           />
         </div>
 
-        {/* Submit */}
         <Button type="submit" disabled={isLoading} className="h-11 w-full">
           {isLoading ? (
             <>
@@ -98,7 +97,6 @@ const LoginForm = () => {
           )}
         </Button>
 
-        {/* Footer */}
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link
