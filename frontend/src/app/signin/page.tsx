@@ -1,25 +1,16 @@
-import "./globals.css";
+import Login from "@/components/auth/signin";
 import { generateSeoMetadata } from "@/lib/SEO";
-import { Providers } from "./providers";
 
 export const metadata = generateSeoMetadata({
-  title: "Appify Social | Modern Social Media Platform",
+  title: "Login | Appify Social",
   description:
     "Appify Social is a modern social networking application built with Next.js, Node.js, MongoDB, Redux Toolkit, and TypeScript. Users can create posts, upload images, like, comment, reply, and manage private or public content securely.",
 
   schemaTypes: ["WebSite", "WebApplication", "SoftwareApplication"],
 });
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  );
-}
+const LoginPage = () => {
+  return <Login />;
+};
+
+export default LoginPage;
