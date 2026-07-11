@@ -40,15 +40,6 @@ const AuthBranding = () => {
           </p>
         </div>
 
-        <div className="my-12 flex justify-center">
-          <img
-            src="/images/auth-illustration.png"
-            alt="Social Platform Illustration"
-            className="w-full max-w-xs object-contain"
-            draggable={false}
-          />
-        </div>
-
         <div className="space-y-4">
           {FEATURES.map((feature) => (
             <div

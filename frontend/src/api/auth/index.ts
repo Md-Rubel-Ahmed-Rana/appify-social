@@ -1,4 +1,5 @@
-import { LoginInput } from "@/components/auth/signin/login-schema";
+import { SigninInput } from "@/components/auth/signin/signin-schema";
+import { SignupInput } from "@/components/auth/signup/signup-schema";
 import { apiSlice } from "@/redux";
 
 const authApi = apiSlice.injectEndpoints({
@@ -10,8 +11,16 @@ const authApi = apiSlice.injectEndpoints({
       providesTags: ["auth"],
     }),
     login: build.mutation({
-      query: (data: LoginInput) => ({
+      query: (data: SigninInput) => ({
         url: `/auth/login`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["auth"],
+    }),
+    register: build.mutation({
+      query: (data: SignupInput) => ({
+        url: `/auth/register`,
         method: "POST",
         body: data,
       }),
@@ -27,5 +36,9 @@ const authApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetUserProfileQuery, useLoginMutation, useLogoutMutation } =
-  authApi;
+export const {
+  useGetUserProfileQuery,
+  useLoginMutation,
+  useLogoutMutation,
+  useRegisterMutation,
+} = authApi;

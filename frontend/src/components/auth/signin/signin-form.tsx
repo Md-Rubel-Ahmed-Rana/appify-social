@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PasswordInput from "@/components/common/password-input";
 
-import { loginSchema, LoginInput } from "./login-schema";
+import { signinSchema, SigninInput } from "./signin-schema";
 import { useLoginMutation } from "@/api/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -22,8 +22,8 @@ const LoginForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<SigninInput>({
+    resolver: zodResolver(signinSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -31,7 +31,7 @@ const LoginForm = () => {
     mode: "onChange",
   });
 
-  const handleLogin = async (values: LoginInput) => {
+  const handleLogin = async (values: SigninInput) => {
     try {
       const result = await login(values).unwrap();
       console.log(result);
