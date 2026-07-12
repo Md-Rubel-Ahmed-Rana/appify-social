@@ -190,20 +190,10 @@ class JWT {
       next();
     } catch (error) {
       if (error instanceof TokenExpiredError) {
-        return this.logoutUser(res);
+        return cookieManager.clearTokens(res);
       }
       throw new ApiError(HttpStatusCode.UNAUTHORIZED, "Unauthenticated access");
     }
-  };
-
-  private logoutUser = (res: Response) => {
-    cookieManager.clearTokens(res);
-    return res.status(HttpStatusCode.OK).json({
-      statusCode: HttpStatusCode.OK,
-      success: true,
-      message: "You have logged out",
-      data: null,
-    });
   };
 }
 

@@ -5,17 +5,19 @@ class CookieManager {
   private readonly accessTokenName = envConfig.jwt.access_cookie_name;
   private readonly refreshTokenName = envConfig.jwt.refresh_cookie_name;
 
-  private cookieOptions = {
+  private setCookieOptions = {
     httpOnly: true,
-    sameSite: "none" as const,
     secure: true,
+    sameSite: "none" as const,
+    path: "/",
     maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
   };
 
   private clearCookieOptions = {
     httpOnly: true,
-    sameSite: "none" as const,
     secure: true,
+    sameSite: "none" as const,
+    path: "/",
   };
 
   public setTokens(
@@ -23,8 +25,8 @@ class CookieManager {
     accessToken: string,
     refreshToken: string
   ): void {
-    res.cookie(this.accessTokenName, accessToken, this.cookieOptions);
-    res.cookie(this.refreshTokenName, refreshToken, this.cookieOptions);
+    res.cookie(this.accessTokenName, accessToken, this.setCookieOptions);
+    res.cookie(this.refreshTokenName, refreshToken, this.setCookieOptions);
   }
 
   public clearTokens(res: Response): void {
