@@ -9,7 +9,10 @@ class CookieManager {
     httpOnly: true,
     secure: true,
     sameSite: "none" as const,
-    domain: ".mdrubelahmedrana.com",
+    domain:
+      envConfig.app.env === "production"
+        ? ".mdrubelahmedrana.com"
+        : "localhost",
     path: "/",
     maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
   };
@@ -18,8 +21,11 @@ class CookieManager {
     httpOnly: true,
     secure: true,
     sameSite: "none" as const,
+    domain:
+      envConfig.app.env === "production"
+        ? ".mdrubelahmedrana.com"
+        : "localhost",
     path: "/",
-    domain: ".mdrubelahmedrana.com",
   };
 
   public setTokens(
