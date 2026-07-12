@@ -30,5 +30,5 @@ export interface IMedia {
 
   height: number;
 
-  storage_provider: "s3";
+  storage_provider?: "s3";
 }

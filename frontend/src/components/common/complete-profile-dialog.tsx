@@ -22,6 +22,7 @@ import {
 } from "./complete-profile-schema";
 
 import { toast } from "sonner";
+import { useUpdateProfileMutation } from "@/api/auth";
 
 type Props = {
   open: boolean;
@@ -41,10 +42,9 @@ const CompleteProfileDialog = ({ open, setOpen }: Props) => {
       bio: "",
     },
   });
+  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
   const [preview, setPreview] = useState("");
   const router = useRouter();
-
-  const [isLoading] = useState(false);
 
   const handleSelectAvatar = () => {
     fileInputRef.current?.click();
@@ -64,14 +64,15 @@ const CompleteProfileDialog = ({ open, setOpen }: Props) => {
 
   const handleSaveProfile = async (values: CompleteProfileInput) => {
     try {
-      console.log(values);
+      const formdata = new FormData();
+      formdata.append("avatar", values.avatar as File);
+      formdata.append("bio", values.bio as string);
 
-      /**
-       * upload avatar
-       * update profile
-       */
+      const result = await updateProfile(formdata).unwrap();
 
-      toast.success("Profile updated successfully.");
+      if (result?.statusCode === 200) {
+        toast.success(result?.message || "Profile updated successfully.");
+      }
 
       setOpen(false);
       router.replace("/");

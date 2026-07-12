@@ -81,7 +81,9 @@ const AppNavbar = () => {
                   {user.first_name} {user.last_name}
                 </p>
 
-                <p className="text-sm text-muted-foreground">{user.email}</p>
+                <p className="text-sm text-muted-foreground">
+                  {user?.bio || user.email}
+                </p>
               </div>
 
               <DropdownMenuSeparator />

@@ -2,19 +2,12 @@
 
 import { Loader2, ServerCrash } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 
 type Props = {
   open: boolean;
-  onClose: () => void;
-  onRetry?: () => void;
 };
 
-export default function RenderColdStartDialog({
-  open,
-  onClose,
-  onRetry,
-}: Props) {
+const RenderColdStartDialog = ({ open }: Props) => {
   return (
     <Dialog open={open}>
       <DialogContent
@@ -54,19 +47,11 @@ export default function RenderColdStartDialog({
             <div className="mt-8 h-2 w-full overflow-hidden rounded-full bg-slate-700">
               <div className="h-full w-1/3 animate-loading rounded-full bg-blue-500" />
             </div>
-
-            <div className="mt-8 flex w-full gap-3">
-              <Button variant="secondary" className="flex-1" onClick={onRetry}>
-                Retry
-              </Button>
-
-              <Button className="flex-1" onClick={onClose}>
-                Continue
-              </Button>
-            </div>
           </div>
         </div>
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default RenderColdStartDialog;

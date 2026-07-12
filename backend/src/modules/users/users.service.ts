@@ -22,7 +22,7 @@ class Service {
   }
 
   async getLoggedInUser(id: Types.ObjectId) {
-    const user = await UserModel.findById(id).select({ password: 0 });
+    const user = await UserModel.findById(id).populate("avatar_id");
 
     if (!user) {
       throw new ApiError(HttpStatusCode.NOT_FOUND, "Invalid credentials");
@@ -44,11 +44,21 @@ class Service {
   }
 
   async getUserByIdWithoutPassword(id: Types.ObjectId) {
-    const user = await UserModel.findById(id).select({ password: 0 });
+    const user = await UserModel.findById(id).populate("avatar_id");
     if (!user) {
       throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
     }
     return user;
+  }
+
+  async updateUser(id: Types.ObjectId, data: Partial<IUser>) {
+    const user = await UserModel.findByIdAndUpdate(id, { ...data });
+    if (!user) {
+      throw new ApiError(
+        HttpStatusCode.NOT_FOUND,
+        "User was not found to update profile"
+      );
+    }
   }
 }
 

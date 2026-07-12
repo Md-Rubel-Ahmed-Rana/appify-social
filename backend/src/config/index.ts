@@ -30,7 +30,7 @@ export const envConfig = {
   aws: {
     access_key_id: process.env.AWS_ACCESS_KEY_ID as string,
     secret_access_key: process.env.AWS_SECRET_ACCESS_KEY as string,
-    region: process.env.AWS_REGION as string,
+    region: process.env.AWS_DEFAULT_REGION as string,
     bucket_name: process.env.AWS_BUCKET_NAME as string,
     file_load_base_url: process.env.AWS_FILE_LOAD_BASE_URL as string,
   },

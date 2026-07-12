@@ -7,6 +7,10 @@ import {
 } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 import path from "path";
+import sharp from "sharp";
+import { FileUploadResponse } from "./uploader.interface";
+import ApiError from "@/middlewares/error";
+import { HttpStatusCode } from "@/lib/httpStatus";
 
 class Service {
   private readonly bucketName = envConfig.aws.bucket_name;
@@ -31,20 +35,38 @@ class Service {
   private async uploadFileToS3(
     file: Express.Multer.File,
     folder: string
-  ): Promise<string> {
-    const fileExt = path.extname(file.originalname).toLowerCase();
-    const fileName = `${randomUUID()}${fileExt}`;
-    const key = `${this.rootFolder}/${folder}/${fileName}`;
+  ): Promise<FileUploadResponse> {
+    try {
+      const metadata = await sharp(file.buffer).metadata();
+      const fileExt = path.extname(file.originalname).toLowerCase();
+      const fileName = `${randomUUID()}${fileExt}`;
+      const key = `${this.rootFolder}/${folder}/${fileName}`;
 
-    const command = new PutObjectCommand({
-      Bucket: this.bucketName,
-      Key: key,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    });
+      const command = new PutObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      });
 
-    await this.s3Client.send(command);
-    return this.getPublicUrl(key);
+      await this.s3Client.send(command);
+      return {
+        public_id: key,
+        url: this.getPublicUrl(key),
+        original_name: file.originalname,
+        mime_type: file.mimetype,
+        extension: fileExt,
+        file_size: file.size,
+        width: metadata.width ?? 0,
+        height: metadata.height ?? 0,
+      };
+    } catch (error: any) {
+      console.log(error);
+      throw new ApiError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        error?.message || "Failed to upload file on S3"
+      );
+    }
   }
 
   private async deleteFileFromS3(key: string): Promise<void> {
@@ -101,14 +123,14 @@ class Service {
   async uploadSingleFile(
     file: Express.Multer.File,
     folder: string
-  ): Promise<string> {
+  ): Promise<FileUploadResponse> {
     return await this.uploadFileToS3(file, folder);
   }
 
   async uploadMultipleFiles(
     files: Express.Multer.File[],
     folder: string
-  ): Promise<string[]> {
+  ): Promise<FileUploadResponse[]> {
     const uploadPromises = files.map((file) =>
       this.uploadFileToS3(file, folder)
     );

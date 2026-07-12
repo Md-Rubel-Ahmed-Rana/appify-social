@@ -33,6 +33,14 @@ const authApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["auth"],
     }),
+    updateProfile: build.mutation({
+      query: (formdata: FormData) => ({
+        url: `/auth/profile`,
+        method: "PATCH",
+        body: formdata,
+      }),
+      invalidatesTags: ["auth"],
+    }),
   }),
 });
 
@@ -41,4 +49,5 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useRegisterMutation,
+  useUpdateProfileMutation,
 } = authApi;

@@ -13,7 +13,7 @@ const userSchema = new Schema<IUser>(
       unique: true,
       trim: true,
     },
-    avatar_url: { type: String, default: null },
+    avatar_id: { type: Schema.Types.ObjectId, default: null, ref: "Media" },
     bio: { type: String, default: null },
     role: { type: String, default: "User" },
     password: { type: String, required: true, select: false },

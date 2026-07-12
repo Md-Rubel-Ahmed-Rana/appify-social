@@ -31,6 +31,16 @@ class Controller extends BaseController {
     });
   });
 
+  updateUserProfile = this.catchAsync(async (req: Request, res: Response) => {
+    await AuthService.updateUserProfile(req.user?.id, req.body);
+    this.sendResponse(res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "User profile updated successfully",
+      data: null,
+    });
+  });
+
   login = this.catchAsync(async (req: Request, res: Response) => {
     const data: any = await AuthService.login(req.body);
 
