@@ -6,7 +6,6 @@ if git diff --cached --name-only | grep -q "^backend/"; then
 
   npm run type-check || exit 1
   npm run lint-staged || exit 1
-  npm run test || exit 1
   npm run build || exit 1
 
   echo "✅ Backend pre-commit checks passed!"

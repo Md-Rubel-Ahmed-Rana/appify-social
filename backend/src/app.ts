@@ -20,6 +20,7 @@ app.get("/", async (req, res) => {
   res.status(200).json({
     statusCode: 200,
     success: true,
+    traceId: req.traceId || null,
     message: "Appify Social server is up and running",
     data: {
       uptime: `${process.uptime().toFixed(2)} seconds`,
