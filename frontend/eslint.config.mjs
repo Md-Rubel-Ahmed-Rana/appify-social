@@ -13,7 +13,6 @@ export default defineConfig([
       '@typescript-eslint/no-explicit-any': 'off',
       '@next/next/no-img-element': 'off',
 
-      // Husky will fail on these
       'no-trailing-spaces': 'error',
       'no-multi-spaces': 'error',
     },
