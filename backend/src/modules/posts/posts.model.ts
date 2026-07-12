@@ -11,6 +11,12 @@ const postSchema = new Schema<IPost>(
       index: true,
     },
 
+    image_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Media",
+      default: null,
+    },
+
     content: {
       type: String,
       trim: true,
@@ -31,11 +37,6 @@ const postSchema = new Schema<IPost>(
     },
 
     comment_count: {
-      type: Number,
-      default: 0,
-    },
-
-    media_count: {
       type: Number,
       default: 0,
     },

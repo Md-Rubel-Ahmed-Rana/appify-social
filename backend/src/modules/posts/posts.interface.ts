@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { IMedia } from "../media/media.interface";
 
 export enum Visibility {
   PUBLIC = "public",
@@ -10,13 +11,13 @@ export interface IPost {
 
   content: string;
 
+  image_id?: Types.ObjectId | IMedia;
+
   visibility: Visibility;
 
-  like_count: number;
+  like_count?: number;
 
-  comment_count: number;
-
-  media_count: number;
+  comment_count?: number;
 
   created_at?: Date;
 
