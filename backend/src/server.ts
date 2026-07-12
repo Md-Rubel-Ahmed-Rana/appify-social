@@ -2,6 +2,7 @@ import { Server } from "http";
 import app from "./app";
 import { envConfig } from "./config";
 import mongodbConnection from "./config/mongoDbConnection";
+import { connectRedis } from "./config/redis";
 
 process.on("uncaughtException", (error) => {
   console.error(`Uncaught Exception: ${error.message}`, { stack: error.stack });
@@ -15,6 +16,7 @@ async function main() {
   try {
     // connect database first
     await mongodbConnection();
+    await connectRedis();
     server = app.listen(port, async () => {
       console.info(`🚀 Application is running on port ${port}`);
     });

@@ -1,4 +1,5 @@
 import { IUser } from "@/modules/users/users.interface";
+import { Request } from "express";
 import { Types } from "mongoose";
 
 export type IJWtPayload = {
@@ -24,3 +25,10 @@ export type IGenericErrorMessage = {
   path: string | number;
   message: string;
 };
+
+export interface RateLimitOptions {
+  windowInSeconds: number;
+  maxRequests: number;
+  keyPrefix?: string;
+  getKey?: (req: Request) => string;
+}

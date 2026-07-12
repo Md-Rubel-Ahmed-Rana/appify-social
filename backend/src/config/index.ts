@@ -34,4 +34,9 @@ export const envConfig = {
     bucket_name: process.env.AWS_BUCKET_NAME as string,
     file_load_base_url: process.env.AWS_FILE_LOAD_BASE_URL as string,
   },
+  redis: {
+    password: process.env.REDIS_PASSWORD as string,
+    host: process.env.REDIS_HOST as string,
+    port: process.env.REDIS_PORT as string,
+  },
 };
