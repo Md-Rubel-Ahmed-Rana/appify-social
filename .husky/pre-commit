@@ -1,0 +1,16 @@
+. "$(dirname "$0")/_/husky.sh"
+
+if git diff --cached --name-only | grep -q "^backend/"; then
+  echo "🟢 Backend changes detected — running backend checks..."
+
+  cd backend
+
+  npm run type-check || exit 1
+  npm run lint-staged || exit 1
+  npm run test || exit 1
+  npm run build || exit 1
+
+  echo "✅ Backend pre-commit checks passed!"
+else
+  echo "ℹ️ No backend changes — skipping backend checks."
+fi
