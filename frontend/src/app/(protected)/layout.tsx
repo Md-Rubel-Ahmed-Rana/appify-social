@@ -1,4 +1,4 @@
-import AppNavbar from "@/components/layout/app-navbar";
+import Navbar from "@/components/layout/navbar";
 
 export default function ProtectedLayout({
   children,
@@ -7,7 +7,7 @@ export default function ProtectedLayout({
 }) {
   return (
     <div className="min-h-screen bg-slate-100">
-      <AppNavbar />
+      <Navbar />
       <main>{children}</main>
     </div>
   );

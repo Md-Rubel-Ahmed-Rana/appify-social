@@ -61,7 +61,11 @@ const CreatePostCard = () => {
         </div>
       </section>
       {isCreatePost && (
-        <CreatePostModal open={isCreatePost} setOpen={setIsCreatePost} />
+        <CreatePostModal
+          open={isCreatePost}
+          setOpen={setIsCreatePost}
+          user={user}
+        />
       )}
     </>
   );
