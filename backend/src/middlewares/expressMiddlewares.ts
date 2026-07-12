@@ -6,6 +6,7 @@ import morgan from "morgan";
 import { corsOptions } from "@/config/corsOptions";
 import { loggerMiddleware } from "./logger";
 import { HttpStatusCode } from "@/lib/httpStatus";
+import { traceMiddleware } from "./trace.middleware";
 
 export const expressMiddlewares = (app: Application) => {
   app.use(cors(corsOptions));
@@ -18,6 +19,7 @@ export const expressMiddlewares = (app: Application) => {
 
   // logger
   app.use(loggerMiddleware);
+  app.use(traceMiddleware);
 };
 
 export const notFoundRoutes = (app: Application) => {

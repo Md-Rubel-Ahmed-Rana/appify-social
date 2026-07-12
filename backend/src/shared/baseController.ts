@@ -4,6 +4,7 @@ type IApiResponse<T> = {
   statusCode: number;
   success: boolean;
   message?: string | null;
+  traceId?: string | null;
   data?: T | null;
 };
 
@@ -22,10 +23,11 @@ class BaseController {
       }
     };
 
-  sendResponse<T>(res: Response, data: IApiResponse<T>): void {
+  sendResponse<T>(req: Request, res: Response, data: IApiResponse<T>): void {
     const responseData: IApiResponse<T> = {
       statusCode: data.statusCode,
       success: data.success,
+      traceId: req.traceId || null,
       message: data.message || null,
       data: data.data || null || undefined,
     };

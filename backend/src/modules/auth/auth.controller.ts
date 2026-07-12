@@ -13,7 +13,7 @@ class Controller extends BaseController {
 
     cookieManager.setTokens(res, access_token, refresh_token);
 
-    this.sendResponse(res, {
+    this.sendResponse(req, res, {
       statusCode: HttpStatusCode.CREATED,
       success: true,
       message: `Your account has been created successfully`,
@@ -23,7 +23,7 @@ class Controller extends BaseController {
 
   getLoggedInUser = this.catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.getLoggedInUser(req.user?.id);
-    this.sendResponse(res, {
+    this.sendResponse(req, res, {
       statusCode: HttpStatusCode.OK,
       success: true,
       message: "Authenticated user retrieved successfully",
@@ -33,7 +33,7 @@ class Controller extends BaseController {
 
   updateUserProfile = this.catchAsync(async (req: Request, res: Response) => {
     await AuthService.updateUserProfile(req.user?.id, req.body);
-    this.sendResponse(res, {
+    this.sendResponse(req, res, {
       statusCode: HttpStatusCode.OK,
       success: true,
       message: "User profile updated successfully",
@@ -46,7 +46,7 @@ class Controller extends BaseController {
 
     const { access_token, refresh_token, user } = data as ILoginResponse;
     cookieManager.setTokens(res, access_token, refresh_token);
-    this.sendResponse(res, {
+    this.sendResponse(req, res, {
       statusCode: HttpStatusCode.OK,
       success: true,
       message: "User has been logged in  successfully",
@@ -56,7 +56,7 @@ class Controller extends BaseController {
 
   logout = this.catchAsync(async (req: Request, res: Response) => {
     cookieManager.clearTokens(res);
-    this.sendResponse(res, {
+    this.sendResponse(req, res, {
       statusCode: HttpStatusCode.OK,
       success: true,
       message: "User logged out successfully",

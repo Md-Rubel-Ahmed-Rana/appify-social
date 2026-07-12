@@ -6,6 +6,7 @@ declare global {
       user: JwtPayload | null | any;
       file: Express.Multer.File | undefined;
       files: Express.Multer.File[] | undefined;
+      traceId: string | undefined;
     }
   }
 }

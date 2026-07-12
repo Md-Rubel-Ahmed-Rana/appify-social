@@ -60,7 +60,6 @@ class ErrorHandler {
       : [];
   }
 
-  // handle generic error
   public handleGenericError(error: Error) {
     this.message = error?.message || "Something went wrong";
     this.errorMessages = error?.message
@@ -73,7 +72,6 @@ class ErrorHandler {
       : [];
   }
 
-  // handle mongodb objectId cast/invalid error
   public handleCastError(error: mongoose.Error.CastError) {
     const errors: IGenericErrorMessage[] = [
       {
@@ -87,7 +85,6 @@ class ErrorHandler {
     this.message = `Invalid MongoDB ObjectId`;
   }
 
-  // handle mongoose validation error
   public handleMongodbValidationError(error: mongoose.Error.ValidationError) {
     const errors: IGenericErrorMessage[] = Object.values(error.errors).map(
       (el: mongoose.Error.ValidatorError | mongoose.Error.CastError) => {
@@ -102,7 +99,6 @@ class ErrorHandler {
     this.message = "Validation Error!";
   }
 
-  // handle multer file size error
   public handleMulterError(error: multer.MulterError) {
     if (error.code === "LIMIT_FILE_SIZE") {
       this.statusCode = HttpStatusCode.BAD_REQUEST;
@@ -154,6 +150,7 @@ class ErrorHandler {
       statusCode: this.statusCode,
       success: false,
       message: this.message,
+      traceId: req.traceId || null,
       errorMessages: this.errorMessages,
       stack: process.env.NODE_ENV !== "production" ? error.stack : undefined,
     });

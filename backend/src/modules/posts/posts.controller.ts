@@ -24,10 +24,10 @@ class Controller extends BaseController {
       file
     );
 
-    this.sendResponse(res, {
+    this.sendResponse(req, res, {
       statusCode: HttpStatusCode.CREATED,
       success: true,
-      message: "Your post has been created successfully",
+      message: "Your post has been published successfully",
       data: result,
     });
   });
