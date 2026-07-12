@@ -1,5 +1,3 @@
-// proxy.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { envConfig } from "./config";
 
@@ -14,23 +12,18 @@ export default function proxy(req: NextRequest) {
 
   const isAuthenticated = Boolean(accessToken || refreshToken);
 
-  // Private Routes
   const isPrivateRoute = pathname === "/" || pathname.startsWith("/feed");
 
-  // Auth Routes
   const isAuthRoute = pathname === "/signin" || pathname === "/signup";
 
-  // Unauthenticated user trying to access a private page
   if (isPrivateRoute && !isAuthenticated) {
     const loginUrl = new URL("/signin", req.url);
 
-    // Preserve original destination
     loginUrl.searchParams.set("redirect", `${pathname}${search}`);
 
     return NextResponse.redirect(loginUrl);
   }
 
-  // Authenticated user shouldn't visit signin/signup
   if (isAuthRoute && isAuthenticated) {
     const redirect = req.nextUrl.searchParams.get("redirect") || "/";
 
