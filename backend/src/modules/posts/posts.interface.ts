@@ -25,3 +25,25 @@ export interface IPost {
 
   deleted_at?: Date | null; // for soft delete
 }
+
+export interface FeedPostDto {
+  id: string;
+
+  content: string;
+
+  created_at: Date;
+
+  like_count: number;
+
+  comment_count: number;
+
+  author: {
+    id: string;
+
+    name: string;
+
+    avatar_url: string | null;
+  };
+
+  image_url: string | null;
+}

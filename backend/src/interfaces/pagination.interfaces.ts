@@ -1,5 +1,5 @@
 export type IPaginationOptions = {
-  page?: number;
+  cursor?: string;
   limit?: number;
   sort_by?: string;
   sort_order?: "asc" | "desc";
