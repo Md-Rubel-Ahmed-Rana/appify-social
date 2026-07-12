@@ -1,6 +1,6 @@
 set -e
 
-git fetch origin || true
+git fetch origin main --quiet || true
 
 DEFAULT_BRANCH="main"
 
@@ -18,6 +18,8 @@ if [ -n "$CHANGED_FRONTEND" ]; then
     rm -rf .next
     echo "✅ .next folder removed successfully!"
   fi
+
+  npm run lint-staged || exit 1
 
   npm run build || { echo "❌ Frontend build failed"; exit 1; }
 
