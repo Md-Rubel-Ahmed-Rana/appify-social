@@ -51,12 +51,13 @@ const postSchema = new Schema<IPost>(
 
 postSchema.index({
   visibility: 1,
+  deleted_at: 1,
   created_at: -1,
 });
 
 postSchema.index({
   author_id: 1,
+  deleted_at: 1,
   created_at: -1,
 });
-
 export const PostModel = model("Post", postSchema);

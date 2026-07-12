@@ -7,6 +7,7 @@ import { corsOptions } from "@/config/corsOptions";
 import { loggerMiddleware } from "./logger";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import { traceMiddleware } from "./trace.middleware";
+import { rateLimiter } from "./rate-limiter";
 
 export const expressMiddlewares = (app: Application) => {
   app.use(cors(corsOptions));
@@ -20,6 +21,13 @@ export const expressMiddlewares = (app: Application) => {
   // logger
   app.use(loggerMiddleware);
   app.use(traceMiddleware);
+  app.use(
+    rateLimiter({
+      keyPrefix: "rl:global",
+      windowInSeconds: 60,
+      maxRequests: 1000,
+    })
+  );
 };
 
 export const notFoundRoutes = (app: Application) => {

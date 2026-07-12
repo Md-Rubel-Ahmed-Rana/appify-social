@@ -5,17 +5,21 @@ import validateRequest from "@/middlewares/validateRequest";
 import { AuthValidations } from "./auth.validate";
 import { upload } from "@/config/multer";
 import { UserMiddleware } from "@/middlewares/user.upload";
+import { loginLimiter } from "@/middlewares/rate-limiter/login-limiter";
+import { registerLimiter } from "@/middlewares/rate-limiter/register-limiter";
 
 const router = Router();
 
 router.post(
   "/register",
+  registerLimiter,
   validateRequest(AuthValidations.register),
   AuthController.register
 );
 
 router.post(
   "/login",
+  loginLimiter,
   validateRequest(AuthValidations.login),
   AuthController.login
 );

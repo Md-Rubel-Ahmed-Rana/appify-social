@@ -1,10 +1,27 @@
+import { QueryFilter, Types } from "mongoose";
+import { IPaginationOptions } from "@/interfaces/pagination.interfaces";
 import { AWSFileUploader } from "../aws/uploader";
 import { MediaOwnerType } from "../media/media.interface";
 import { MediaService } from "../media/media.service";
-import { IPost } from "./posts.interface";
+import { FeedPostDto, IPost, Visibility } from "./posts.interface";
 import { PostModel } from "./posts.model";
+import { LikesService } from "../likes/likes.service";
+import { LikeTargetType } from "../likes/likes.interface";
 
 class Service {
+  private readonly DEFAULT_PAGE_SIZE = 10;
+  private readonly MAX_PAGE_SIZE = 50;
+
+  private clampPageSize(limit?: number) {
+    const value = Number(limit ?? this.DEFAULT_PAGE_SIZE);
+
+    if (!Number.isFinite(value)) {
+      return this.DEFAULT_PAGE_SIZE;
+    }
+
+    return Math.max(1, Math.min(value, this.MAX_PAGE_SIZE));
+  }
+
   async create(data: IPost, file?: Express.Multer.File) {
     const post = await PostModel.create(data);
 
@@ -28,6 +45,117 @@ class Service {
 
     return {
       id: post._id,
+    };
+  }
+
+  async getFeedPosts(options: IPaginationOptions, userId: Types.ObjectId) {
+    const start = performance.now();
+
+    const {
+      limit = 10,
+      cursor,
+      sort_by = "_id",
+      sort_order = "desc",
+    } = options;
+
+    const safeLimit = this.clampPageSize(limit);
+
+    const filter: QueryFilter<IPost> = {
+      visibility: Visibility.PUBLIC,
+      deleted_at: null,
+    };
+
+    if (cursor) {
+      filter._id = {
+        $lt: new Types.ObjectId(cursor),
+      };
+    }
+
+    const posts = await PostModel.find(filter)
+      .sort({
+        [sort_by]: sort_order === "asc" ? 1 : -1,
+      })
+      .limit(safeLimit)
+      .populate({
+        path: "author_id",
+        select: "first_name last_name avatar_id",
+        populate: {
+          path: "avatar_id",
+          select: "url",
+        },
+      })
+      .populate({
+        path: "image_id",
+        select: "url width height mime_type",
+      })
+      .lean();
+
+    if (!posts.length) {
+      return {
+        meta: {
+          page_size: safeLimit,
+          next_cursor: null,
+          has_more: false,
+        },
+        posts: [],
+      };
+    }
+
+    const nextCursor =
+      posts.length === safeLimit
+        ? posts[posts.length - 1]._id.toString()
+        : null;
+
+    const postsDto = posts.map(this.toFeedPostDto);
+    const postIds = posts.map((post) => post._id);
+    const currentUserLikes = await LikesService.getLikesByUserForTargets(
+      userId,
+      LikeTargetType.POST,
+      postIds
+    );
+
+    const likedPostIds = new Set(
+      currentUserLikes.map((like) => like.target_id.toString())
+    );
+
+    console.log({
+      PostQueryPerformance: `Feed query took ${(performance.now() - start).toFixed(2)} ms`,
+    });
+    return {
+      meta: {
+        page_size: safeLimit,
+        post_count: postsDto.length,
+        next_cursor: nextCursor,
+        has_more: !!nextCursor,
+      },
+      posts: postsDto.map((post) => ({
+        ...post,
+        is_liked: likedPostIds.has(post.id.toString()),
+      })),
+    };
+  }
+
+  private toFeedPostDto(post: any): FeedPostDto {
+    return {
+      id: post._id.toString(),
+
+      content: post.content,
+
+      created_at: post.created_at,
+
+      like_count: post.like_count,
+
+      comment_count: post.comment_count,
+
+      author: {
+        id: post.author_id._id.toString(),
+
+        name: `${post.author_id.first_name} ${post.author_id.last_name}`,
+
+        avatar_url: post.author_id?.avatar_id?.url,
+      },
+
+      image_url: post.image_id?.url || null,
     };
   }
 }

@@ -1,5 +1,5 @@
 export const paginationFields: string[] = [
-  "page",
+  "cursor",
   "limit",
   "sort_by",
   "sort_order",

@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { PostsService } from "./posts.service";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import ApiError from "@/middlewares/error";
+import pickQueries from "@/shared/pickQueries";
+import { paginationFields } from "@/constants/paginationFields";
 
 class Controller extends BaseController {
   create = this.catchAsync(async (req: Request, res: Response) => {
@@ -28,6 +30,17 @@ class Controller extends BaseController {
       statusCode: HttpStatusCode.CREATED,
       success: true,
       message: "Your post has been published successfully",
+      data: result,
+    });
+  });
+
+  getFeedPosts = this.catchAsync(async (req: Request, res: Response) => {
+    const options = pickQueries(req.query, paginationFields);
+    const result = await PostsService.getFeedPosts(options, req.user.id);
+    this.sendResponse(req, res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "Feed posts retrieved successfully",
       data: result,
     });
   });
