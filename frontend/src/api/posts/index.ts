@@ -12,12 +12,16 @@ const postApi = apiSlice.injectEndpoints({
     }),
 
     feedPosts: build.query({
-      query: () => ({
-        url: `/posts`,
+      query: ({ nextCursor }: { nextCursor?: string | null } = {}) => ({
+        url: nextCursor ? `/posts?cursor=${nextCursor}` : '/posts',
       }),
       providesTags: ['posts'],
     }),
   }),
 });
 
-export const { usePublishPostMutation, useFeedPostsQuery } = postApi;
+export const {
+  usePublishPostMutation,
+  useFeedPostsQuery,
+  useLazyFeedPostsQuery,
+} = postApi;
