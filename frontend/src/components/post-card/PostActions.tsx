@@ -1,24 +1,23 @@
 'use client';
-
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, Share2 } from 'lucide-react';
+import { MessageCircle, Share2 } from 'lucide-react';
+import LikeUnlikeAction from './LikeUnlikeAction';
 
 type Props = {
   liked: boolean;
   like_count: number;
   comment_count: number;
+  post_id: string;
 };
 
-const PostActions = ({ liked, comment_count, like_count }: Props) => {
+const PostActions = ({ liked, comment_count, like_count, post_id }: Props) => {
   return (
     <div className="grid grid-cols-3 gap-2">
-      <Button variant="ghost" className="gap-2">
-        <Heart
-          className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : ''}`}
-        />
-        <span> {like_count}</span>
-        <span>Like</span>
-      </Button>
+      <LikeUnlikeAction
+        liked={liked}
+        like_count={like_count}
+        target_id={post_id}
+      />
 
       <Button variant="ghost" className="gap-2">
         <MessageCircle className="h-4 w-4" />
