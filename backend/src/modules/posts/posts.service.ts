@@ -118,9 +118,6 @@ class Service {
       currentUserLikes.map((like) => like.target_id.toString())
     );
 
-    console.log({
-      PostQueryPerformance: `Feed query took ${(performance.now() - start).toFixed(2)} ms`,
-    });
     return {
       meta: {
         page_size: safeLimit,
@@ -155,7 +152,13 @@ class Service {
         avatar_url: post.author_id?.avatar_id?.url,
       },
 
-      image_url: post.image_id?.url || null,
+      image: post.image_id
+        ? {
+            url: post.image_id?.url,
+            width: post.image_id?.width,
+            height: post.image_id?.height,
+          }
+        : null,
     };
   }
 }
