@@ -1,10 +1,87 @@
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { LikeModel } from "./likes.model";
-import { LikeTargetType } from "./likes.interface";
+import { ILike, LikeTargetType } from "./likes.interface";
+import { PostModel } from "../posts/posts.model";
+import { CommentModel } from "../comments/comments.model";
+import { ReplyModel } from "../replies/replies.model";
+import ApiError from "@/middlewares/error";
+import { HttpStatusCode } from "@/lib/httpStatus";
 
 class Service {
-  async getLikesByUser(userId: Types.ObjectId, target_type: LikeTargetType) {
-    return await LikeModel.find({ user_id: userId, target_type });
+  private async processLike(data: ILike, increment: 1 | -1): Promise<void> {
+    const session = await mongoose.startSession();
+
+    const modelMap = {
+      [LikeTargetType.POST]: PostModel,
+      [LikeTargetType.COMMENT]: CommentModel,
+      [LikeTargetType.REPLY]: ReplyModel,
+    } as const;
+
+    try {
+      session.startTransaction();
+
+      if (increment === 1) {
+        await LikeModel.create([data], { session });
+      } else {
+        const { deletedCount } = await LikeModel.deleteOne(
+          {
+            user_id: data.user_id,
+            target_type: data.target_type,
+            target_id: data.target_id,
+          },
+          { session }
+        );
+
+        if (deletedCount === 0) {
+          throw new ApiError(HttpStatusCode.NOT_FOUND, "Like not found.");
+        }
+      }
+
+      const Model = modelMap[data.target_type];
+
+      const result = await (Model as any).updateOne(
+        {
+          _id: data.target_id,
+        },
+        {
+          $inc: {
+            like_count: increment,
+          },
+        },
+        {
+          session,
+        }
+      );
+
+      if (result.matchedCount === 0) {
+        throw new ApiError(
+          HttpStatusCode.NOT_FOUND,
+          `${data.target_type} not found.`
+        );
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      console.log(error);
+
+      throw new ApiError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        `Failed to ${
+          increment === 1 ? "like" : "unlike"
+        } the resource. Please try again.`
+      );
+    } finally {
+      await session.endSession();
+    }
+  }
+
+  async like(data: ILike) {
+    await this.processLike(data, 1);
+  }
+
+  async unlike(data: ILike) {
+    await this.processLike(data, -1);
   }
 
   async getLikesByUserForTargets(
