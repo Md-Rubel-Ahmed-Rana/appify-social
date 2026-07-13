@@ -5,12 +5,13 @@ import { HttpStatusCode } from "@/lib/httpStatus";
 import ApiError from "@/middlewares/error";
 import pickQueries from "@/shared/pickQueries";
 import { paginationFields } from "@/constants/paginationFields";
+import { Types } from "mongoose";
 
 class Controller extends BaseController {
   create = this.catchAsync(async (req: Request, res: Response) => {
     const file = req.file;
 
-    if (!file && !req?.body?.content?.trim()) {
+    if (!file && !req.body?.content?.trim()) {
       throw new ApiError(
         HttpStatusCode.BAD_REQUEST,
         "At least one field must be provided to create a post."
@@ -20,7 +21,7 @@ class Controller extends BaseController {
     const result = await PostsService.create(
       {
         author_id: req.user.id,
-        content: req.body.content,
+        content: req.body?.content,
         visibility: req.body.visibility,
       },
       file
@@ -41,6 +42,17 @@ class Controller extends BaseController {
       statusCode: HttpStatusCode.OK,
       success: true,
       message: "Feed posts retrieved successfully",
+      data: result,
+    });
+  });
+
+  getLikesByPost = this.catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id as unknown as Types.ObjectId;
+    const result = await PostsService.getLikesByPost(id);
+    this.sendResponse(req, res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "Post likes retrieved successfully",
       data: result,
     });
   });

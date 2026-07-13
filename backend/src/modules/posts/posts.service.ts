@@ -7,6 +7,9 @@ import { FeedPostDto, IPost, Visibility } from "./posts.interface";
 import { PostModel } from "./posts.model";
 import { LikesService } from "../likes/likes.service";
 import { LikeTargetType } from "../likes/likes.interface";
+import { sanitizePostContent } from "@/utils/sanitize";
+import ApiError from "@/middlewares/error";
+import { HttpStatusCode } from "@/lib/httpStatus";
 
 class Service {
   private readonly DEFAULT_PAGE_SIZE = 10;
@@ -23,6 +26,17 @@ class Service {
   }
 
   async create(data: IPost, file?: Express.Multer.File) {
+    if (typeof data.content === "string" && data.content.trim()) {
+      if (data.content.length > 5000) {
+        throw new ApiError(
+          HttpStatusCode.BAD_REQUEST,
+          "Post content cannot exceed 5000 characters."
+        );
+      }
+      // Currently, we don't allow Rich Text (HTML) as content. It maybe allow in future
+      data.content = sanitizePostContent(data.content);
+    }
+
     const post = await PostModel.create(data);
 
     if (file) {
@@ -130,6 +144,15 @@ class Service {
         is_liked: likedPostIds.has(post.id.toString()),
       })),
     };
+  }
+
+  async getLikesByPost(id: Types.ObjectId) {
+    const post = await PostModel.findById(id);
+    if (!post) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "Post was not found");
+    }
+
+    return await LikesService.getLikeByTargetResource(id);
   }
 
   private toFeedPostDto(post: any): FeedPostDto {
