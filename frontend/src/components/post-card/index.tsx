@@ -26,6 +26,7 @@ const PostCard = ({ post }: Props) => {
           liked={post.is_liked}
           like_count={post.like_count}
           comment_count={post.comment_count}
+          post_id={post.id}
         />
       </CardContent>
     </Card>
