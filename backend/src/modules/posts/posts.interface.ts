@@ -45,5 +45,11 @@ export interface FeedPostDto {
     avatar_url: string | null;
   };
 
-  image_url: string | null;
+  image: PostImage | null;
 }
+
+type PostImage = {
+  url: string;
+  width: number;
+  height: number;
+};
