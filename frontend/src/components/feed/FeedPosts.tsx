@@ -38,8 +38,6 @@ const FeedPosts = () => {
   useEffect(() => {
     if (!posts.length) return;
 
-    if (feedPosts.length > 0) return;
-
     setFeedPosts(posts);
 
     setFeedMeta({
