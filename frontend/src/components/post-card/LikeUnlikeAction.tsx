@@ -1,9 +1,10 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLikeMutation, useUnlikeMutation } from '@/api/likes';
+import { useState } from 'react';
+import LikersModal from './LikersModal';
 
 type Props = {
   target_id: string;
@@ -14,6 +15,7 @@ type Props = {
 const LikeUnlikeAction = ({ target_id, liked, like_count }: Props) => {
   const [like, { isLoading: isLiking }] = useLikeMutation();
   const [unlike, { isLoading: isUnliking }] = useUnlikeMutation();
+  const [showLikers, setShowLikers] = useState(false);
 
   const isLoading = isLiking || isUnliking;
 
@@ -32,22 +34,39 @@ const LikeUnlikeAction = ({ target_id, liked, like_count }: Props) => {
   };
 
   return (
-    <Button
-      variant="ghost"
-      className="gap-2"
-      onClick={handleToggleLike}
-      disabled={isLoading}
-    >
-      <Heart
-        className={`h-4 w-4 transition-colors ${
-          liked ? 'fill-red-500 text-red-500' : ''
-        }`}
-      />
+    <>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={handleToggleLike}
+          disabled={isLoading}
+          className="flex items-center"
+        >
+          <Heart
+            className={`h-4 w-4 transition-colors ${
+              liked ? 'fill-red-500 text-red-500' : ''
+            }`}
+          />
+        </button>
 
-      <span>{like_count}</span>
+        <button
+          type="button"
+          onClick={() => setShowLikers(true)}
+          disabled={like_count === 0}
+          className="text-sm text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-60"
+        >
+          {like_count} {like_count === 1 ? 'Like' : 'Likes'}
+        </button>
+      </div>
 
-      <span>{liked ? 'Liked' : 'Like'}</span>
-    </Button>
+      {showLikers && (
+        <LikersModal
+          open={showLikers}
+          setOpen={setShowLikers}
+          post_id={target_id}
+        />
+      )}
+    </>
   );
 };
 
