@@ -33,6 +33,7 @@ class Service {
           "Post content cannot exceed 5000 characters."
         );
       }
+      // Currently, we don't allow Rich Text (HTML) as content. It maybe allow in future
       data.content = sanitizePostContent(data.content);
     }
 
@@ -143,6 +144,15 @@ class Service {
         is_liked: likedPostIds.has(post.id.toString()),
       })),
     };
+  }
+
+  async getLikesByPost(id: Types.ObjectId) {
+    const post = await PostModel.findById(id);
+    if (!post) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "Post was not found");
+    }
+
+    return await LikesService.getLikeByTargetResource(id);
   }
 
   private toFeedPostDto(post: any): FeedPostDto {

@@ -5,6 +5,7 @@ import { HttpStatusCode } from "@/lib/httpStatus";
 import ApiError from "@/middlewares/error";
 import pickQueries from "@/shared/pickQueries";
 import { paginationFields } from "@/constants/paginationFields";
+import { Types } from "mongoose";
 
 class Controller extends BaseController {
   create = this.catchAsync(async (req: Request, res: Response) => {
@@ -41,6 +42,17 @@ class Controller extends BaseController {
       statusCode: HttpStatusCode.OK,
       success: true,
       message: "Feed posts retrieved successfully",
+      data: result,
+    });
+  });
+
+  getLikesByPost = this.catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id as unknown as Types.ObjectId;
+    const result = await PostsService.getLikesByPost(id);
+    this.sendResponse(req, res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "Post likes retrieved successfully",
       data: result,
     });
   });

@@ -8,6 +8,8 @@ const router = Router();
 
 router.get("/", feedLimiter, PostsController.getFeedPosts);
 
+router.get("/:id/likes", feedLimiter, PostsController.getLikesByPost);
+
 router.post(
   "/",
   createPostLimiter,
