@@ -1,16 +1,23 @@
-import { apiSlice } from "@/redux";
+import { apiSlice } from '@/redux';
 
 const postApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
     publishPost: build.mutation({
       query: (formdata: FormData) => ({
         url: `/posts`,
-        method: "POST",
+        method: 'POST',
         body: formdata,
       }),
-      invalidatesTags: ["posts"],
+      invalidatesTags: ['posts'],
+    }),
+
+    feedPosts: build.query({
+      query: () => ({
+        url: `/posts`,
+      }),
+      providesTags: ['posts'],
     }),
   }),
 });
 
-export const { usePublishPostMutation } = postApi;
+export const { usePublishPostMutation, useFeedPostsQuery } = postApi;
