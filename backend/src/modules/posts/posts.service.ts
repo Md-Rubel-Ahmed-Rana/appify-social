@@ -7,6 +7,9 @@ import { FeedPostDto, IPost, Visibility } from "./posts.interface";
 import { PostModel } from "./posts.model";
 import { LikesService } from "../likes/likes.service";
 import { LikeTargetType } from "../likes/likes.interface";
+import { sanitizePostContent } from "@/utils/sanitize";
+import ApiError from "@/middlewares/error";
+import { HttpStatusCode } from "@/lib/httpStatus";
 
 class Service {
   private readonly DEFAULT_PAGE_SIZE = 10;
@@ -23,6 +26,16 @@ class Service {
   }
 
   async create(data: IPost, file?: Express.Multer.File) {
+    if (typeof data.content === "string" && data.content.trim()) {
+      if (data.content.length > 5000) {
+        throw new ApiError(
+          HttpStatusCode.BAD_REQUEST,
+          "Post content cannot exceed 5000 characters."
+        );
+      }
+      data.content = sanitizePostContent(data.content);
+    }
+
     const post = await PostModel.create(data);
 
     if (file) {

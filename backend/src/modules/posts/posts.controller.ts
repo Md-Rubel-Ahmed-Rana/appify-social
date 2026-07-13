@@ -10,7 +10,7 @@ class Controller extends BaseController {
   create = this.catchAsync(async (req: Request, res: Response) => {
     const file = req.file;
 
-    if (!file && !req?.body?.content?.trim()) {
+    if (!file && !req.body?.content?.trim()) {
       throw new ApiError(
         HttpStatusCode.BAD_REQUEST,
         "At least one field must be provided to create a post."
@@ -20,7 +20,7 @@ class Controller extends BaseController {
     const result = await PostsService.create(
       {
         author_id: req.user.id,
-        content: req.body.content,
+        content: req.body?.content,
         visibility: req.body.visibility,
       },
       file
