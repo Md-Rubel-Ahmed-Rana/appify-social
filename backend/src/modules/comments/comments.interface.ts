@@ -7,9 +7,9 @@ export interface IComment {
 
   content: string;
 
-  reply_count: number;
+  reply_count?: number;
 
-  like_count: number;
+  like_count?: number;
 
   created_at?: Date;
 

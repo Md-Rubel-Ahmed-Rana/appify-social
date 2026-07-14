@@ -10,21 +10,10 @@ import { LikeTargetType } from "../likes/likes.interface";
 import { sanitizePostContent } from "@/utils/sanitize";
 import ApiError from "@/middlewares/error";
 import { HttpStatusCode } from "@/lib/httpStatus";
+import { CommentsService } from "../comments/comments.service";
+import { calculatePageSize } from "@/utils/calculatePageSize";
 
 class Service {
-  private readonly DEFAULT_PAGE_SIZE = 10;
-  private readonly MAX_PAGE_SIZE = 50;
-
-  private clampPageSize(limit?: number) {
-    const value = Number(limit ?? this.DEFAULT_PAGE_SIZE);
-
-    if (!Number.isFinite(value)) {
-      return this.DEFAULT_PAGE_SIZE;
-    }
-
-    return Math.max(1, Math.min(value, this.MAX_PAGE_SIZE));
-  }
-
   async create(data: IPost, file?: Express.Multer.File) {
     if (typeof data.content === "string" && data.content.trim()) {
       if (data.content.length > 5000) {
@@ -63,8 +52,6 @@ class Service {
   }
 
   async getFeedPosts(options: IPaginationOptions, userId: Types.ObjectId) {
-    const start = performance.now();
-
     const {
       limit = 10,
       cursor,
@@ -72,7 +59,7 @@ class Service {
       sort_order = "desc",
     } = options;
 
-    const safeLimit = this.clampPageSize(limit);
+    const safeLimit = calculatePageSize(limit);
 
     const filter: QueryFilter<IPost> = {
       visibility: Visibility.PUBLIC,
@@ -153,6 +140,19 @@ class Service {
     }
 
     return await LikesService.getLikeByTargetResource(id);
+  }
+
+  async getCommentsByPost(
+    id: Types.ObjectId,
+    userId: Types.ObjectId,
+    options: IPaginationOptions
+  ) {
+    const post = await PostModel.findById(id).lean(); // DB Call -1
+    if (!post) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "Post was not found");
+    }
+
+    return await CommentsService.getCommentsByPost(id, userId, options);
   }
 
   private toFeedPostDto(post: any): FeedPostDto {
