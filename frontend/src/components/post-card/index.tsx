@@ -5,6 +5,7 @@ import PostActions from './PostActions';
 import PostContent from './PostContent';
 import PostHeader from './PostHeader';
 import PostImage from './PostImage';
+import PostOwnerActions from './PostOwnerActions';
 
 type Props = {
   post: Post;
@@ -14,7 +15,10 @@ const PostCard = ({ post }: Props) => {
   return (
     <Card>
       <CardContent className="space-y-3 px-3 py-1">
-        <PostHeader author={post.author} created_at={post.created_at} />
+        <div className="flex justify-between">
+          <PostHeader author={post.author} created_at={post.created_at} />
+          {post.is_owner && <PostOwnerActions post={post} />}
+        </div>
 
         <PostContent content={post.content} />
 
