@@ -1,9 +1,8 @@
-import { Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNowStrict } from 'date-fns';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Comment } from '@/types/comment.type';
+import CommentActions from './comment-actions';
 
 type Props = {
   comment: Comment;
@@ -37,35 +36,7 @@ const CommentCard = ({ comment }: Props) => {
           {comment.content}
         </p>
 
-        <div className="mt-3 flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 gap-1 px-2 text-muted-foreground"
-          >
-            <Heart
-              className={`h-4 w-4 ${
-                comment.is_liked ? 'fill-red-500 text-red-500' : ''
-              }`}
-            />
-
-            {comment.like_count > 0 && <span>{comment.like_count}</span>}
-
-            <span>Like</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 gap-1 px-2 text-muted-foreground"
-          >
-            <MessageCircle className="h-4 w-4" />
-
-            {comment.reply_count > 0 && <span>{comment.reply_count}</span>}
-
-            <span>Reply</span>
-          </Button>
-        </div>
+        <CommentActions comment={comment} />
       </div>
     </article>
   );

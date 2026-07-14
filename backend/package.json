@@ -27,9 +27,9 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
-    "build": "tsc && tsc-alias",
-    "start": "node -r tsconfig-paths/register dist/server.js",
+    "dev": "node api.js && ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
+    "build": "node api.js && tsc && tsc-alias",
+    "start": "node api.js && node -r tsconfig-paths/register dist/server.js",
     "start:prod": "NODE_ENV=production node dist/server.js",
     "clean": "rimraf dist",
     "rebuild": "npm run clean && npm run build",

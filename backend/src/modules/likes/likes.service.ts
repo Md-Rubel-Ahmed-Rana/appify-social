@@ -84,6 +84,29 @@ class Service {
     await this.processLike(data, -1);
   }
 
+  async getLikeByTargetIdAndType(
+    target_id: Types.ObjectId,
+    target_type: LikeTargetType
+  ) {
+    const likes = await LikeModel.find({ target_id, target_type })
+      .select("user_id")
+      .populate({
+        path: "user_id",
+        select: "first_name last_name avatar_id",
+        populate: {
+          path: "avatar_id",
+          select: "url",
+        },
+      });
+
+    return likes.map((like: any) => ({
+      user_id: like.user_id._id,
+      first_name: like.user_id.first_name,
+      last_name: like.user_id.last_name,
+      avatar_url: like.user_id.avatar_id.url,
+    }));
+  }
+
   async getLikeByTargetResource(target_id: Types.ObjectId) {
     const likes = await LikeModel.find({ target_id })
       .select("user_id")

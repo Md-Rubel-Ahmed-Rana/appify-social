@@ -7,6 +7,7 @@ const router = Router();
 
 router
   .route("/")
+  .get(LikeController.getLikeByTargetIdAndType)
   .post(validateRequest(LikeValidations.create), LikeController.like)
   .delete(validateRequest(LikeValidations.create), LikeController.unlike);
 
