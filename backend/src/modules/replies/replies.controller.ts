@@ -41,6 +41,32 @@ class Controller extends BaseController {
       },
     });
   });
+
+  update = this.catchAsync(async (req, res) => {
+    const id = req.params.id as unknown as Types.ObjectId;
+    const result = await RepliesService.update(
+      id,
+      req.user.id,
+      req.body.content
+    );
+    this.sendResponse(req, res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "Reply updated successfully",
+      data: result,
+    });
+  });
+
+  delete = this.catchAsync(async (req, res) => {
+    const id = req.params.id as unknown as Types.ObjectId;
+    const result = await RepliesService.delete(id, req.user.id);
+    this.sendResponse(req, res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "Reply deleted successfully",
+      data: result,
+    });
+  });
 }
 
 export const RepliesController = new Controller();

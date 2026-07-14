@@ -10,4 +10,9 @@ router
   .get(RepliesController.getRepliesByComment)
   .post(validateRequest(ReplyValidations.reply), RepliesController.create);
 
+router
+  .route("/:id")
+  .patch(validateRequest(ReplyValidations.update), RepliesController.update)
+  .delete(RepliesController.delete);
+
 export const RepliesRoutes = router;
