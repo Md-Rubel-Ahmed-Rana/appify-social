@@ -10,9 +10,15 @@ type Props = {
   target_id: string;
   liked: boolean;
   like_count: number;
+  target_type: 'post' | 'comment' | 'reply';
 };
 
-const LikeUnlikeAction = ({ target_id, liked, like_count }: Props) => {
+const LikeUnlikeAction = ({
+  target_id,
+  liked,
+  like_count,
+  target_type,
+}: Props) => {
   const [like, { isLoading: isLiking }] = useLikeMutation();
   const [unlike, { isLoading: isUnliking }] = useUnlikeMutation();
   const [showLikers, setShowLikers] = useState(false);
@@ -24,9 +30,9 @@ const LikeUnlikeAction = ({ target_id, liked, like_count }: Props) => {
 
     try {
       if (liked) {
-        await unlike({ target_id, target_type: 'post' }).unwrap();
+        await unlike({ target_id, target_type }).unwrap();
       } else {
-        await like({ target_id, target_type: 'post' }).unwrap();
+        await like({ target_id, target_type }).unwrap();
       }
     } catch (error: any) {
       toast.error(error?.message || 'Something went wrong.');
@@ -41,9 +47,10 @@ const LikeUnlikeAction = ({ target_id, liked, like_count }: Props) => {
           onClick={handleToggleLike}
           disabled={isLoading}
           className="flex items-center"
+          title={liked ? 'Withdraw your like' : `Like to this ${target_type}`}
         >
           <Heart
-            className={`h-4 w-4 transition-colors ${
+            className={`h-4 w-4 transition-colors cursor-pointer ${
               liked ? 'fill-red-500 text-red-500' : ''
             }`}
           />
@@ -53,7 +60,8 @@ const LikeUnlikeAction = ({ target_id, liked, like_count }: Props) => {
           type="button"
           onClick={() => setShowLikers(true)}
           disabled={like_count === 0}
-          className="text-sm text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-60"
+          className="text-sm text-muted-foreground cursor-pointer hover:text-foreground disabled:pointer-events-none disabled:opacity-60"
+          title={`Show who like(s) on this ${target_type}`}
         >
           {like_count} {like_count === 1 ? 'Like' : 'Likes'}
         </button>
@@ -63,7 +71,8 @@ const LikeUnlikeAction = ({ target_id, liked, like_count }: Props) => {
         <LikersModal
           open={showLikers}
           setOpen={setShowLikers}
-          post_id={target_id}
+          target_id={target_id}
+          target_type={target_type}
         />
       )}
     </>
