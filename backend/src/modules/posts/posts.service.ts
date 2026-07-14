@@ -129,6 +129,7 @@ class Service {
       posts: postsDto.map((post) => ({
         ...post,
         is_liked: likedPostIds.has(post.id.toString()),
+        is_owner: userId.toString() === post.author.id.toString(),
       })),
     };
   }
@@ -147,7 +148,7 @@ class Service {
     userId: Types.ObjectId,
     options: IPaginationOptions
   ) {
-    const post = await PostModel.findById(id).lean(); // DB Call -1
+    const post = await PostModel.findById(id).lean();
     if (!post) {
       throw new ApiError(HttpStatusCode.NOT_FOUND, "Post was not found");
     }

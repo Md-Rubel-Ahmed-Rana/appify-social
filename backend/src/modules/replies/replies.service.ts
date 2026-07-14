@@ -4,6 +4,8 @@ import { ReplyModel } from "./replies.model";
 import ApiError from "@/middlewares/error";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import { CommentModel } from "../comments/comments.model";
+import { LikesService } from "../likes/likes.service";
+import { LikeTargetType } from "../likes/likes.interface";
 
 class Service {
   async create(data: IReply) {
@@ -78,7 +80,7 @@ class Service {
     }
   }
 
-  async getRepliesByComment(commentId: Types.ObjectId) {
+  async getRepliesByComment(commentId: Types.ObjectId, userId: Types.ObjectId) {
     if (!commentId?.toString()?.trim()) {
       throw new ApiError(HttpStatusCode.BAD_REQUEST, "Comment id is required");
     }
@@ -108,12 +110,26 @@ class Service {
       .sort({ created_at: 1 })
       .lean();
 
+    const replyIds = replies.map((reply) => reply._id);
+
+    const currentUserLikes = await LikesService.getLikesByUserForTargets(
+      userId,
+      LikeTargetType.REPLY,
+      replyIds
+    );
+
+    const likedRepliedIds = new Set(
+      currentUserLikes.map((like) => like?.target_id?.toString())
+    );
+
     return {
       replies: replies.map((reply: any) => ({
         id: reply._id,
         content: reply.content,
         like_count: reply.like_count,
         created_at: reply.created_at,
+        is_liked: likedRepliedIds.has(reply._id.toString()),
+        is_owner: userId.toString() === reply.author_id._id.toString(),
         parent_reply_id: reply.parent_reply_id,
         author: {
           id: reply.author_id._id,

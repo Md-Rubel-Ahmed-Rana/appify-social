@@ -23,7 +23,10 @@ class Controller extends BaseController {
 
   getRepliesByComment = this.catchAsync(async (req, res) => {
     const comment_id = req.query.comment_id as unknown as Types.ObjectId;
-    const result = await RepliesService.getRepliesByComment(comment_id);
+    const result = await RepliesService.getRepliesByComment(
+      comment_id,
+      req.user.id
+    );
     this.sendResponse(req, res, {
       statusCode: HttpStatusCode.OK,
       success: true,
