@@ -8,7 +8,7 @@ export const apiSlice = createApi({
     baseUrl: `${envConfig.base_api}`,
     credentials: 'include',
   }),
-  tagTypes: ['auth', 'posts', 'comments'],
+  tagTypes: ['auth', 'posts', 'comments', 'replies'],
   endpoints: () => ({}),
 });
 

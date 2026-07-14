@@ -14,6 +14,19 @@ const likeApi = apiSlice.injectEndpoints({
       invalidatesTags: ['posts'],
     }),
 
+    getLikes: build.query({
+      query: ({
+        target_id,
+        target_type,
+      }: {
+        target_id: string;
+        target_type: 'post' | 'comment' | 'reply';
+      }) => ({
+        url: `/likes?target_id=${target_id}&target_type=${target_type}`,
+      }),
+      providesTags: ['posts', 'comments', 'replies'],
+    }),
+
     unlike: build.mutation({
       query: (data: {
         target_id: string;
@@ -28,4 +41,4 @@ const likeApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useLikeMutation, useUnlikeMutation } = likeApi;
+export const { useLikeMutation, useUnlikeMutation, useGetLikesQuery } = likeApi;
