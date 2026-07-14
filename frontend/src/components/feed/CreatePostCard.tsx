@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { ImagePlus, Globe2, ChevronDown } from "lucide-react";
+import { ImagePlus, Globe2, ChevronDown } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { useGetUserProfileQuery } from "@/api/auth";
-import { User } from "@/types/user.type";
-import { useState } from "react";
-import CreatePostModal from "../create-post";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { useGetUserProfileQuery } from '@/api/auth';
+import { User } from '@/types/user.type';
+import { useState } from 'react';
+import CreatePostModal from '../create-post';
 
 const CreatePostCard = () => {
   const [isCreatePost, setIsCreatePost] = useState(false);
@@ -29,7 +29,7 @@ const CreatePostCard = () => {
           <button
             onClick={() => setIsCreatePost(true)}
             type="button"
-            className="flex h-11 flex-1 items-center rounded-full bg-muted px-4 text-left text-sm text-muted-foreground transition-colors hover:bg-muted/80"
+            className="flex h-11 flex-1 items-center rounded-full bg-muted px-4 text-left text-sm text-muted-foreground transition-colors hover:bg-muted/80 cursor-pointer"
           >
             What&apos;s on your mind, {user.first_name}?
           </button>
