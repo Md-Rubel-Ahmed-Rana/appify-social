@@ -156,7 +156,7 @@ class Service {
       };
     }
 
-    const comments = await CommentModel.find(filter) // DB call -2
+    const comments = await CommentModel.find(filter)
       .sort({ _id: -1 })
       .limit(safeLimit)
       .populate({
@@ -183,7 +183,6 @@ class Service {
 
     const commentIds = comments.map((comment) => comment._id);
     const currentUserLikes = await LikesService.getLikesByUserForTargets(
-      // DB Call -3
       userId,
       LikeTargetType.COMMENT,
       commentIds
@@ -199,11 +198,13 @@ class Service {
       reply_count: comment.reply_count,
       like_count: comment.like_count,
       author: {
+        id: comment.author_id._id.toString(),
         first_name: comment.author_id.first_name,
         last_name: comment.author_id.last_name,
         avatar_url: comment.author_id.avatar_id?.url ?? null,
       },
       is_liked: likedCommentIds.has(comment._id.toString()),
+      is_owner: userId.toString() === comment.author_id._id.toString(),
       created_at: comment.created_at,
     }));
 

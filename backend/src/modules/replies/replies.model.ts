@@ -11,9 +11,23 @@ const replySchema = new Schema<IReply>(
       ref: "Comment",
     },
 
+    parent_reply_id: {
+      type: Schema.Types.ObjectId,
+      default: null,
+      index: true,
+      ref: "Reply",
+    },
+
     author_id: {
       type: Schema.Types.ObjectId,
       required: true,
+      index: true,
+      ref: "User",
+    },
+
+    reply_to_user_id: {
+      type: Schema.Types.ObjectId,
+      default: null,
       index: true,
       ref: "User",
     },

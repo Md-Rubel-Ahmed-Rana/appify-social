@@ -16,7 +16,14 @@ class Controller extends BaseController {
       statusCode: HttpStatusCode.OK,
       success: true,
       message: "Likes retrieved successfully",
-      data: result,
+      data: {
+        current_user: {
+          id: req.user.id,
+          first_name: req.user.first_name,
+          last_name: req.user.last_name,
+        },
+        ...result,
+      },
     });
   });
 
