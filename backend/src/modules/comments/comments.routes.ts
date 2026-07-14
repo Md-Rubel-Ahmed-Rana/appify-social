@@ -11,4 +11,10 @@ router.post(
   CommentsController.create
 );
 
+router.patch(
+  "/:id",
+  validateRequest(CommentValidations.update),
+  CommentsController.update
+);
+
 export const CommentsRoutes = router;
