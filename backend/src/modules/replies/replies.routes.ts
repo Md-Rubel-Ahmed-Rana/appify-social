@@ -5,10 +5,9 @@ import { RepliesController } from "./replies.controller";
 
 const router = Router();
 
-router.post(
-  "/",
-  validateRequest(ReplyValidations.reply),
-  RepliesController.create
-);
+router
+  .route("/")
+  .get(RepliesController.getRepliesByComment)
+  .post(validateRequest(ReplyValidations.reply), RepliesController.create);
 
 export const RepliesRoutes = router;

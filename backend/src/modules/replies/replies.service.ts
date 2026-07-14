@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { IReply } from "./replies.interface";
 import { ReplyModel } from "./replies.model";
 import ApiError from "@/middlewares/error";
@@ -76,6 +76,61 @@ class Service {
     } finally {
       await session.endSession();
     }
+  }
+
+  async getRepliesByComment(commentId: Types.ObjectId) {
+    if (!commentId?.toString()?.trim()) {
+      throw new ApiError(HttpStatusCode.BAD_REQUEST, "Comment id is required");
+    }
+    const replies = await ReplyModel.find({
+      comment_id: commentId,
+      deleted_at: null,
+    })
+      .select(
+        "_id comment_id parent_reply_id author_id reply_to_user_id content like_count created_at"
+      )
+      .populate({
+        path: "author_id",
+        select: "_id first_name last_name avatar_id",
+        populate: {
+          path: "avatar_id",
+          select: "_id url",
+        },
+      })
+      .populate({
+        path: "reply_to_user_id",
+        select: "_id first_name last_name avatar_id",
+        populate: {
+          path: "avatar_id",
+          select: "_id url",
+        },
+      })
+      .sort({ created_at: 1 })
+      .lean();
+
+    return {
+      replies: replies.map((reply: any) => ({
+        id: reply._id,
+        content: reply.content,
+        like_count: reply.like_count,
+        created_at: reply.created_at,
+        parent_reply_id: reply.parent_reply_id,
+        author: {
+          id: reply.author_id._id,
+          name: reply.author_id.first_name + reply.author_id.last_name,
+          avatar_url: reply.author_id.avatar_id.url || null,
+        },
+        reply_to_user: reply.reply_to_user_id
+          ? {
+              id: reply.reply_to_user_id._id,
+              name:
+                reply.reply_to_user_id.first_name +
+                reply.reply_to_user_id.last_name,
+              avatar_url: reply.reply_to_user_id.avatar_id.url || null,
+            }
+          : null,
+      })),
+    };
   }
 }
 
