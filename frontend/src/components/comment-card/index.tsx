@@ -1,16 +1,18 @@
 import { formatDistanceToNowStrict } from 'date-fns';
-
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Comment } from '@/types/comment.type';
 import CommentActions from './comment-actions';
+import { useState } from 'react';
+import Replies from '../replies';
 
 type Props = {
   comment: Comment;
 };
 
 const CommentCard = ({ comment }: Props) => {
+  const [showReplies, setShowReplies] = useState(false);
   const authorName = `${comment.author.first_name} ${comment.author.last_name}`;
-
   const initials = `${comment.author.first_name.charAt(0)}${comment.author.last_name.charAt(0)}`;
 
   return (
@@ -37,6 +39,17 @@ const CommentCard = ({ comment }: Props) => {
         </p>
 
         <CommentActions comment={comment} />
+        {showReplies && <Replies comment_id={comment?.id} />}
+
+        {comment.reply_count > 0 && (
+          <Button variant="link" onClick={() => setShowReplies(!showReplies)}>
+            {showReplies
+              ? 'Hide replies'
+              : `View ${comment.reply_count} ${
+                  comment.reply_count === 1 ? 'reply' : 'replies'
+                }`}
+          </Button>
+        )}
       </div>
     </article>
   );

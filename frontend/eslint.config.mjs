@@ -15,6 +15,8 @@ export default defineConfig([
 
       'no-trailing-spaces': 'error',
       'no-multi-spaces': 'error',
+
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 ]);

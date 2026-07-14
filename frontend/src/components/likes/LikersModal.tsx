@@ -33,7 +33,7 @@ const LikersModal = ({ open, setOpen, target_id, target_type }: Props) => {
     },
   );
 
-  const likers = (data?.data ?? []) as Liker[];
+  const likers = (data?.data?.likes ?? []) as Liker[];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
