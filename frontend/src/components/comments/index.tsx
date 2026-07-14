@@ -6,12 +6,14 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerFooter,
 } from '@/components/ui/drawer';
 import { Comment } from '@/types/comment.type';
 import CommentsList from './CommentsList';
 import EmptyComments from './EmptyComments';
 import CommentsError from './CommentsError';
 import CommentsSkeleton from './CommentsSkeleton';
+import CreateComment from '../create-comment';
 
 type Props = {
   open: boolean;
@@ -35,8 +37,8 @@ const CommentsDrawer = ({ open, setOpen, post_id }: Props) => {
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent className="mx-auto flex h-[90vh] w-full max-w-3xl flex-col rounded-t-3xl shadow-2xl">
-        <DrawerHeader className="sticky top-0 z-10 border-b bg-background">
+      <DrawerContent className="min-h-0 mx-auto flex w-full max-w-2xl  flex-col rounded-t-3xl shadow-2xl">
+        <DrawerHeader className="sticky top-0 z-10  border-b bg-background">
           <DrawerTitle className="text-center font-semibold text-xl">
             Comments
           </DrawerTitle>
@@ -53,6 +55,9 @@ const CommentsDrawer = ({ open, setOpen, post_id }: Props) => {
             <CommentsList comments={comments} />
           )}
         </div>
+        <DrawerFooter className="border-t bg-background p-2">
+          <CreateComment post_id={post_id} />
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );
