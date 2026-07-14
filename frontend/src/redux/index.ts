@@ -1,14 +1,14 @@
-import { envConfig } from "@/config";
-import { configureStore } from "@reduxjs/toolkit";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { envConfig } from '@/config';
+import { configureStore } from '@reduxjs/toolkit';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const apiSlice = createApi({
-  reducerPath: "api",
+  reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: `${envConfig.base_api}`,
-    credentials: "include",
+    credentials: 'include',
   }),
-  tagTypes: ["auth", "posts"],
+  tagTypes: ['auth', 'posts', 'comments', 'replies'],
   endpoints: () => ({}),
 });
 
