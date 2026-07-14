@@ -156,6 +156,44 @@ class Service {
     return await CommentsService.getCommentsByPost(id, userId, options);
   }
 
+  async updatePost(
+    id: Types.ObjectId,
+    authorId: Types.ObjectId,
+    content: string
+  ) {
+    if (typeof content === "string" && content.trim()) {
+      if (content.length > 5000) {
+        throw new ApiError(
+          HttpStatusCode.BAD_REQUEST,
+          "Post content cannot exceed 5000 characters."
+        );
+      }
+      content = sanitizePostContent(content);
+    } else {
+      throw new ApiError(
+        HttpStatusCode.BAD_REQUEST,
+        "Post content is required"
+      );
+    }
+
+    const result = await PostModel.findOneAndUpdate(
+      {
+        _id: id,
+        author_id: authorId,
+      },
+      {
+        $set: { content },
+      }
+    );
+
+    if (!result) {
+      throw new ApiError(
+        HttpStatusCode.NOT_FOUND,
+        "Post was not found or you are not owner of the post"
+      );
+    }
+  }
+
   private toFeedPostDto(post: any): FeedPostDto {
     return {
       id: post._id.toString(),

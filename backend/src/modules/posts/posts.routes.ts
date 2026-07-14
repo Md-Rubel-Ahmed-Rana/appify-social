@@ -3,20 +3,24 @@ import { PostsController } from "./posts.controller";
 import { upload } from "@/config/multer";
 import { feedLimiter } from "@/middlewares/rate-limiter/feed-limiter";
 import { createPostLimiter } from "@/middlewares/rate-limiter/create-post-limiter";
+import validateRequest from "@/middlewares/validateRequest";
+import { PostValidations } from "./posts.validate";
 
 const router = Router();
 
-router.get("/", feedLimiter, PostsController.getFeedPosts);
+router
+  .route("/")
+  .post(createPostLimiter, upload.single("image"), PostsController.create)
+  .get(feedLimiter, PostsController.getFeedPosts);
+
+router.patch(
+  "/:id",
+  validateRequest(PostValidations.update),
+  PostsController.updatePost
+);
 
 router.get("/:id/likes", PostsController.getLikesByPost);
 
 router.get("/:id/comments", PostsController.getCommentsByPost);
-
-router.post(
-  "/",
-  createPostLimiter,
-  upload.single("image"),
-  PostsController.create
-);
 
 export const PostsRoutes = router;
