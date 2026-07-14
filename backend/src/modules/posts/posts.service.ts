@@ -1,4 +1,4 @@
-import { QueryFilter, Types } from "mongoose";
+import mongoose, { QueryFilter, Types } from "mongoose";
 import { IPaginationOptions } from "@/interfaces/pagination.interfaces";
 import { AWSFileUploader } from "../aws/uploader";
 import { MediaOwnerType } from "../media/media.interface";
@@ -12,6 +12,9 @@ import ApiError from "@/middlewares/error";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import { CommentsService } from "../comments/comments.service";
 import { calculatePageSize } from "@/utils/calculatePageSize";
+import { CommentModel } from "../comments/comments.model";
+import { LikeModel } from "../likes/likes.model";
+import { ReplyModel } from "../replies/replies.model";
 
 class Service {
   async create(data: IPost, file?: Express.Multer.File) {
@@ -154,6 +157,160 @@ class Service {
     }
 
     return await CommentsService.getCommentsByPost(id, userId, options);
+  }
+
+  async updatePost(
+    id: Types.ObjectId,
+    authorId: Types.ObjectId,
+    content: string
+  ) {
+    if (typeof content === "string" && content.trim()) {
+      if (content.length > 5000) {
+        throw new ApiError(
+          HttpStatusCode.BAD_REQUEST,
+          "Post content cannot exceed 5000 characters."
+        );
+      }
+      content = sanitizePostContent(content);
+    } else {
+      throw new ApiError(
+        HttpStatusCode.BAD_REQUEST,
+        "Post content is required"
+      );
+    }
+
+    const result = await PostModel.findOneAndUpdate(
+      {
+        _id: id,
+        author_id: authorId,
+      },
+      {
+        $set: { content },
+      }
+    );
+
+    if (!result) {
+      throw new ApiError(
+        HttpStatusCode.NOT_FOUND,
+        "Post was not found or you are not owner of the post"
+      );
+    }
+  }
+
+  // ======== Note ========
+  /*
+    Right now, I intentionally perform all the operation at once with MongoDB ACID Operation
+    But, for a production application, I always prefer to use background job to perform cascading deletion for very large dataset
+  */
+  async delete(id: Types.ObjectId, authorId: Types.ObjectId) {
+    const session = await mongoose.startSession();
+
+    try {
+      session.startTransaction();
+
+      const post = await PostModel.findOne({
+        _id: id,
+        author_id: authorId,
+      }).session(session);
+
+      if (!post) {
+        throw new ApiError(
+          HttpStatusCode.NOT_FOUND,
+          "Post was not found or you are not authorized to perform this action."
+        );
+      }
+
+      const comments = await CommentModel.find(
+        { post_id: post._id },
+        { _id: 1 }
+      ).session(session);
+
+      const commentIds = comments.map((c) => c._id);
+
+      let replyIds: Types.ObjectId[] = [];
+
+      if (commentIds.length) {
+        const replies = await ReplyModel.find(
+          {
+            comment_id: { $in: commentIds },
+          },
+          { _id: 1 }
+        ).session(session);
+
+        replyIds = replies.map((r) => r._id);
+      }
+
+      const deleteOperations: Promise<unknown>[] = [];
+
+      if (replyIds.length) {
+        deleteOperations.push(
+          LikeModel.deleteMany(
+            {
+              target_id: { $in: replyIds },
+              target_type: LikeTargetType.REPLY,
+            },
+            { session }
+          )
+        );
+      }
+
+      if (commentIds.length) {
+        deleteOperations.push(
+          ReplyModel.deleteMany(
+            {
+              comment_id: { $in: commentIds },
+            },
+            { session }
+          ),
+
+          LikeModel.deleteMany(
+            {
+              target_id: { $in: commentIds },
+              target_type: LikeTargetType.COMMENT,
+            },
+            { session }
+          ),
+
+          CommentModel.deleteMany(
+            {
+              post_id: post._id,
+            },
+            { session }
+          )
+        );
+      }
+
+      deleteOperations.push(
+        LikeModel.deleteMany(
+          {
+            target_id: post._id,
+            target_type: LikeTargetType.POST,
+          },
+          { session }
+        )
+      );
+
+      await Promise.all(deleteOperations);
+
+      await post.deleteOne({ session });
+
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      console.error(error);
+
+      throw new ApiError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        "Failed to delete post. Please try again!"
+      );
+    } finally {
+      await session.endSession();
+    }
   }
 
   private toFeedPostDto(post: any): FeedPostDto {

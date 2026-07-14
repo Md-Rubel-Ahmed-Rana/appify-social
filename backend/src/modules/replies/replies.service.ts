@@ -6,6 +6,7 @@ import { HttpStatusCode } from "@/lib/httpStatus";
 import { CommentModel } from "../comments/comments.model";
 import { LikesService } from "../likes/likes.service";
 import { LikeTargetType } from "../likes/likes.interface";
+import { LikeModel } from "../likes/likes.model";
 
 class Service {
   async create(data: IReply) {
@@ -147,6 +148,126 @@ class Service {
           : null,
       })),
     };
+  }
+
+  async update(id: Types.ObjectId, authorId: Types.ObjectId, content: string) {
+    const reply = await ReplyModel.findOneAndUpdate(
+      {
+        _id: id,
+        author_id: authorId,
+      },
+      {
+        $set: { content },
+      }
+    );
+
+    if (!reply) {
+      throw new ApiError(
+        HttpStatusCode.NOT_FOUND,
+        "Reply not found or you are not authorized to perform action"
+      );
+    }
+  }
+
+  async delete(id: Types.ObjectId, authorId: Types.ObjectId) {
+    const session = await mongoose.startSession();
+
+    try {
+      session.startTransaction();
+
+      const reply = await ReplyModel.findOne({
+        _id: id,
+        author_id: authorId,
+      }).session(session);
+
+      if (!reply) {
+        throw new ApiError(
+          HttpStatusCode.NOT_FOUND,
+          "Reply was not found or you are not authorized to perform the action."
+        );
+      }
+
+      const [tree] = await ReplyModel.aggregate<{
+        descendants: { _id: Types.ObjectId }[];
+      }>([
+        {
+          $match: {
+            _id: reply._id,
+          },
+        },
+        {
+          $graphLookup: {
+            from: ReplyModel.collection.name,
+            startWith: "$_id",
+            connectFromField: "_id",
+            connectToField: "parent_reply_id",
+            as: "descendants",
+          },
+        },
+        {
+          $project: {
+            descendants: {
+              $map: {
+                input: "$descendants",
+                as: "reply",
+                in: {
+                  _id: "$$reply._id",
+                },
+              },
+            },
+          },
+        },
+      ]).session(session);
+
+      const replyIds = [
+        reply._id,
+        ...(tree?.descendants?.map((r) => r._id) ?? []),
+      ];
+
+      await Promise.all([
+        LikeModel.deleteMany(
+          {
+            target_id: { $in: replyIds },
+            target_type: LikeTargetType.REPLY,
+          },
+          { session }
+        ),
+
+        ReplyModel.deleteMany(
+          {
+            _id: { $in: replyIds },
+          },
+          { session }
+        ),
+
+        CommentModel.findByIdAndUpdate(
+          reply.comment_id,
+          {
+            $inc: {
+              reply_count: -replyIds.length,
+            },
+          },
+          { session }
+        ),
+      ]);
+
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      console.error(error);
+
+      throw new ApiError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        "Failed to delete reply. Please try again!"
+      );
+    } finally {
+      await session.endSession();
+    }
   }
 }
 

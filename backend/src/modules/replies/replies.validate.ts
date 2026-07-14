@@ -23,6 +23,17 @@ const replySchema = z.object({
     .strict(),
 });
 
+const replyEditSchema = z.object({
+  body: z.object({
+    content: z
+      .string({ error: "Reply content is required." })
+      .trim()
+      .min(1, "Reply cannot be empty.")
+      .max(5000, "Reply cannot exceed 5000 characters."),
+  }),
+});
+
 export const ReplyValidations = {
   reply: replySchema,
+  update: replyEditSchema,
 };
