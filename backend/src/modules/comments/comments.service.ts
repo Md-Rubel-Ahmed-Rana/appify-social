@@ -55,6 +55,44 @@ class Service {
       );
     }
   }
+
+  async delete(id: Types.ObjectId, authorId: Types.ObjectId) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const comment = await CommentModel.findOne({
+        _id: id,
+        author_id: authorId,
+      }).session(session);
+
+      if (!comment) {
+        throw new ApiError(
+          HttpStatusCode.NOT_FOUND,
+          "Comment was not found or you are not authorized to perform the action."
+        );
+      }
+
+      await CommentModel.findByIdAndDelete(id, { session });
+
+      await PostModel.findByIdAndUpdate(
+        comment.post_id,
+        {
+          $inc: { comment_count: -1 },
+        },
+        { session }
+      );
+
+      await session.commitTransaction();
+    } catch (error) {
+      console.log(error);
+      throw new ApiError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        "Failed to delete comment. Please try again!"
+      );
+    } finally {
+      await session.endSession();
+    }
+  }
 }
 
 export const CommentsService = new Service();

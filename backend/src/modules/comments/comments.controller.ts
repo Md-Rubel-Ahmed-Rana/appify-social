@@ -34,6 +34,18 @@ class Controller extends BaseController {
       data: result,
     });
   });
+
+  delete = this.catchAsync(async (req, res) => {
+    const id = req.params.id as unknown as Types.ObjectId;
+    const result = await CommentsService.delete(id, req.user.id);
+
+    this.sendResponse(req, res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "Comment has been removed successfully",
+      data: result,
+    });
+  });
 }
 
 export const CommentsController = new Controller();
