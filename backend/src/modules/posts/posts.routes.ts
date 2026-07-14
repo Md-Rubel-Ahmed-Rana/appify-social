@@ -13,11 +13,10 @@ router
   .post(createPostLimiter, upload.single("image"), PostsController.create)
   .get(feedLimiter, PostsController.getFeedPosts);
 
-router.patch(
-  "/:id",
-  validateRequest(PostValidations.update),
-  PostsController.updatePost
-);
+router
+  .route("/:id")
+  .patch(validateRequest(PostValidations.update), PostsController.updatePost)
+  .delete(PostsController.delete);
 
 router.get("/:id/likes", PostsController.getLikesByPost);
 
