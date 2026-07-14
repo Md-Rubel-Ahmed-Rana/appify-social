@@ -56,6 +56,23 @@ class Controller extends BaseController {
       data: result,
     });
   });
+
+  getCommentsByPost = this.catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id as unknown as Types.ObjectId;
+    const options = pickQueries(req.query, paginationFields);
+    const result = await PostsService.getCommentsByPost(
+      id,
+      req.user.id,
+      options
+    );
+
+    this.sendResponse(req, res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "Post's comments retrieved successfully",
+      data: result,
+    });
+  });
 }
 
 export const PostsController = new Controller();

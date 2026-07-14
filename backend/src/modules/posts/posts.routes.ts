@@ -8,7 +8,9 @@ const router = Router();
 
 router.get("/", feedLimiter, PostsController.getFeedPosts);
 
-router.get("/:id/likes", feedLimiter, PostsController.getLikesByPost);
+router.get("/:id/likes", PostsController.getLikesByPost);
+
+router.get("/:id/comments", PostsController.getCommentsByPost);
 
 router.post(
   "/",
