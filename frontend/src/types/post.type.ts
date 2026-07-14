@@ -17,6 +17,7 @@ export type Post = {
   created_at: string;
   image: PostImage;
   is_liked: false;
+  is_owner: false;
   comment_count: number;
   like_count: number;
 };

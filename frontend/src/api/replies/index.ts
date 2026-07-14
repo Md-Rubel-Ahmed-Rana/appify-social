@@ -21,7 +21,35 @@ const replyApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['comments', 'replies'],
     }),
+
+    editReply: build.mutation({
+      query: ({
+        reply_id,
+        content,
+      }: {
+        reply_id: string;
+        content: string;
+      }) => ({
+        url: `/replies/${reply_id}`,
+        method: 'PATCH',
+        body: { content },
+      }),
+      invalidatesTags: ['replies'],
+    }),
+
+    deleteReply: build.mutation({
+      query: ({ reply_id }: { reply_id: string }) => ({
+        url: `/replies/${reply_id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['comments', 'replies'],
+    }),
   }),
 });
 
-export const { useGetRepliesQuery, useReplyToResourceMutation } = replyApi;
+export const {
+  useGetRepliesQuery,
+  useReplyToResourceMutation,
+  useEditReplyMutation,
+  useDeleteReplyMutation,
+} = replyApi;

@@ -25,8 +25,35 @@ const commentApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['posts', 'comments'],
     }),
+
+    editComment: build.mutation({
+      query: ({
+        comment_id,
+        content,
+      }: {
+        comment_id: string;
+        content: string;
+      }) => ({
+        url: `/comments/${comment_id}`,
+        method: 'PATCH',
+        body: { content },
+      }),
+      invalidatesTags: ['comments'],
+    }),
+
+    deleteComment: build.mutation({
+      query: ({ comment_id }: { comment_id: string }) => ({
+        url: `/comments/${comment_id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['comments', 'posts'],
+    }),
   }),
 });
 
-export const { useGetCommentsByPostQuery, useAddNewCommentMutation } =
-  commentApi;
+export const {
+  useGetCommentsByPostQuery,
+  useAddNewCommentMutation,
+  useEditCommentMutation,
+  useDeleteCommentMutation,
+} = commentApi;

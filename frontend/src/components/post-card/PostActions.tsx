@@ -1,6 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Share2 } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import LikeUnlikeAction from '../likes/LikeUnlikeAction';
 import { useState } from 'react';
 import CommentsDrawer from '../comments';
@@ -16,7 +16,7 @@ const PostActions = ({ liked, comment_count, like_count, post_id }: Props) => {
   const [showComments, setShowComments] = useState(false);
   return (
     <>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex justify-between">
         <LikeUnlikeAction
           liked={liked}
           like_count={like_count}
@@ -33,12 +33,8 @@ const PostActions = ({ liked, comment_count, like_count, post_id }: Props) => {
           <span>{comment_count}</span>
           <span>Comment</span>
         </Button>
-
-        <Button variant="ghost" className="gap-2">
-          <Share2 className="h-4 w-4" />
-          Share
-        </Button>
       </div>
+
       {showComments && (
         <CommentsDrawer
           open={showComments}

@@ -7,6 +7,7 @@ import { Reply } from '@/types/reply.type';
 import LikeUnlikeAction from '../likes/LikeUnlikeAction';
 import { Button } from '@/components/ui/button';
 import ReplyForm from './ReplyForm';
+import ReplyOwnerActions from './ReplyOwnerActions';
 
 type Props = {
   reply: Reply;
@@ -45,28 +46,31 @@ const ReplyCard = ({
         </Avatar>
 
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-            <span className="font-semibold text-foreground">
-              {reply.author.name}
-            </span>
+          <div className="flex justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+              <span className="font-semibold text-foreground">
+                {reply.author.name}
+              </span>
 
-            {reply.reply_to_user && (
-              <>
-                <span className="text-muted-foreground">replied to</span>
+              {reply.reply_to_user && (
+                <>
+                  <span className="text-muted-foreground">replied to</span>
 
-                <span className="font-medium text-primary">
-                  {reply.reply_to_user.name}
-                </span>
-              </>
-            )}
+                  <span className="font-medium text-primary">
+                    {reply.reply_to_user.name}
+                  </span>
+                </>
+              )}
 
-            <span className="text-muted-foreground">•</span>
+              <span className="text-muted-foreground">•</span>
 
-            <span className="text-muted-foreground">
-              {formatDistanceToNowStrict(new Date(reply.created_at), {
-                addSuffix: true,
-              })}
-            </span>
+              <span className="text-muted-foreground">
+                {formatDistanceToNowStrict(new Date(reply.created_at), {
+                  addSuffix: true,
+                })}
+              </span>
+            </div>
+            {reply.is_owner && <ReplyOwnerActions reply={reply} />}
           </div>
 
           <p className="mt-1 whitespace-pre-wrap wrap-break-word text-sm leading-6">

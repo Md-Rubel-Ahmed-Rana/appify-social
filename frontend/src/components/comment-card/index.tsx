@@ -5,6 +5,7 @@ import { Comment } from '@/types/comment.type';
 import CommentActions from './comment-actions';
 import { useState } from 'react';
 import Replies from '../replies';
+import CommentOwnerActions from './CommentOwnerActions';
 
 type Props = {
   comment: Comment;
@@ -24,14 +25,16 @@ const CommentCard = ({ comment }: Props) => {
       </Avatar>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-3">
-          <h4 className="truncate text-sm font-semibold">{authorName}</h4>
-
-          <span className="shrink-0 text-xs text-muted-foreground">
-            {formatDistanceToNowStrict(new Date(comment.created_at), {
-              addSuffix: true,
-            })}
-          </span>
+        <div className="flex justify-between">
+          <div className="flex items-center gap-3">
+            <h4 className="truncate text-sm font-semibold">{authorName}</h4>
+            <span className="shrink-0 text-xs text-muted-foreground">
+              {formatDistanceToNowStrict(new Date(comment.created_at), {
+                addSuffix: true,
+              })}
+            </span>
+          </div>
+          {comment.is_owner && <CommentOwnerActions comment={comment} />}
         </div>
 
         <p className="mt-1 whitespace-pre-wrap wrap-break-word text-sm leading-6 text-foreground">

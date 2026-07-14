@@ -24,6 +24,23 @@ const postApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['posts'],
     }),
+
+    deletePost: build.mutation({
+      query: ({ post_id }: { post_id: string }) => ({
+        url: `/posts/${post_id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['posts'],
+    }),
+
+    editPost: build.mutation({
+      query: ({ post_id, content }: { post_id: string; content: string }) => ({
+        url: `/posts/${post_id}`,
+        method: 'PATCH',
+        body: { content },
+      }),
+      invalidatesTags: ['posts'],
+    }),
   }),
 });
 
@@ -32,4 +49,6 @@ export const {
   useFeedPostsQuery,
   useLazyFeedPostsQuery,
   useGetLikesByPostQuery,
+  useDeletePostMutation,
+  useEditPostMutation,
 } = postApi;
