@@ -14,13 +14,13 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useEditCommentMutation } from '@/api/comments';
+import { useEditReplyMutation } from '@/api/replies';
 import { toast } from 'sonner';
 
 type Props = {
   open: boolean;
   setOpen: (value: boolean) => void;
-  comment_id: string;
+  reply_id: string;
   content: string;
 };
 
@@ -28,7 +28,7 @@ type FormValues = {
   content: string;
 };
 
-const EditCommentModal = ({ open, setOpen, comment_id, content }: Props) => {
+const EditReplyModal = ({ open, setOpen, reply_id, content }: Props) => {
   const {
     register,
     handleSubmit,
@@ -40,7 +40,7 @@ const EditCommentModal = ({ open, setOpen, comment_id, content }: Props) => {
     },
   });
 
-  const [updateComment, { isLoading }] = useEditCommentMutation();
+  const [updateReply, { isLoading }] = useEditReplyMutation();
 
   useEffect(() => {
     if (open) {
@@ -48,17 +48,17 @@ const EditCommentModal = ({ open, setOpen, comment_id, content }: Props) => {
     }
   }, [content, open, reset]);
 
-  const handleEditComment = async (data: FormValues) => {
+  const handleEditReply = async (data: FormValues) => {
     try {
-      const result = await updateComment({
-        comment_id,
+      const result = await updateReply({
+        reply_id,
         content: data.content,
       }).unwrap();
       if (result.statusCode === 200) {
-        toast.success(result.message || 'Comment has been edited successfully');
+        toast.success(result.message || 'Reply has been edited successfully');
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to edit comment');
+      toast.error(error.message || 'Failed to edit reply');
     }
 
     setOpen(false);
@@ -68,17 +68,17 @@ const EditCommentModal = ({ open, setOpen, comment_id, content }: Props) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Edit Comment</DialogTitle>
+          <DialogTitle>Edit Reply</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(handleEditComment)} className="space-y-5">
+        <form onSubmit={handleSubmit(handleEditReply)} className="space-y-5">
           <Textarea
             {...register('content', {
               required: true,
               maxLength: 1000,
             })}
             rows={6}
-            placeholder="Write your comment"
+            placeholder="Write your reply"
             className="resize-none"
           />
 
@@ -112,4 +112,4 @@ const EditCommentModal = ({ open, setOpen, comment_id, content }: Props) => {
   );
 };
 
-export default EditCommentModal;
+export default EditReplyModal;
