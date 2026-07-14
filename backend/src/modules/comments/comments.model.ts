@@ -22,6 +22,8 @@ const commentSchema = new Schema<IComment>(
       type: String,
       required: true,
       trim: true,
+      minlength: 3,
+      maxlength: 5000,
     },
 
     like_count: {
