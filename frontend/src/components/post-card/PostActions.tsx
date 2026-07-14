@@ -21,6 +21,7 @@ const PostActions = ({ liked, comment_count, like_count, post_id }: Props) => {
           liked={liked}
           like_count={like_count}
           target_id={post_id}
+          target_type="post"
         />
 
         <Button
