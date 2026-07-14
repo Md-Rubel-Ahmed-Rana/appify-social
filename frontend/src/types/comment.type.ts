@@ -11,5 +11,6 @@ export type Comment = {
   like_count: number;
   author: Author;
   is_liked: boolean;
+  is_owner: boolean;
   created_at: string;
 };
