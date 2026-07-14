@@ -9,10 +9,11 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2 } from 'lucide-react';
-import { useGetLikesByPostQuery } from '@/api/posts';
+import { useGetLikesQuery } from '@/api/likes';
 
 type Props = {
-  post_id: string;
+  target_id: string;
+  target_type: 'post' | 'comment' | 'reply';
   open: boolean;
   setOpen: (value: boolean) => void;
 };
@@ -24,9 +25,9 @@ type Liker = {
   avatar_url: string | null;
 };
 
-const LikersModal = ({ open, setOpen, post_id }: Props) => {
-  const { data, isLoading } = useGetLikesByPostQuery(
-    { post_id },
+const LikersModal = ({ open, setOpen, target_id, target_type }: Props) => {
+  const { data, isLoading } = useGetLikesQuery(
+    { target_id, target_type },
     {
       skip: !open,
     },
