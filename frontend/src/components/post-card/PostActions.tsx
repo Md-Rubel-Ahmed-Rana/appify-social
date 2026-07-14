@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Share2 } from 'lucide-react';
-import LikeUnlikeAction from './LikeUnlikeAction';
+import LikeUnlikeAction from '../likes/LikeUnlikeAction';
 import { useState } from 'react';
 import CommentsDrawer from '../comments';
 
