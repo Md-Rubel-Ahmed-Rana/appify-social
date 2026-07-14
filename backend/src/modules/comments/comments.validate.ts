@@ -18,6 +18,18 @@ const createCommentSchema = z.object({
     .strict(),
 });
 
+const updateCommentSchema = z.object({
+  body: z
+    .object({
+      content: z.string({ error: "Content is required" }).min(3).max(5000),
+    })
+    .strict(),
+  params: z.object({
+    id: objectId,
+  }),
+});
+
 export const CommentValidations = {
   create: createCommentSchema,
+  update: updateCommentSchema,
 };

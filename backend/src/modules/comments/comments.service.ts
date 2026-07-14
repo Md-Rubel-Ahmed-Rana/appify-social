@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { IComment } from "./comments.interface";
 import { CommentModel } from "./comments.model";
 import ApiError from "@/middlewares/error";
@@ -34,6 +34,25 @@ class Service {
       );
     } finally {
       await session.endSession();
+    }
+  }
+
+  async update(id: Types.ObjectId, authorId: Types.ObjectId, content: string) {
+    const result = await CommentModel.findOneAndUpdate(
+      {
+        _id: id,
+        author_id: authorId,
+      },
+      {
+        $set: { content },
+      }
+    );
+
+    if (!result) {
+      throw new ApiError(
+        HttpStatusCode.UNAUTHORIZED,
+        "Comment not found or you are not authorized to perform the action."
+      );
     }
   }
 }

@@ -1,6 +1,7 @@
 import BaseController from "@/shared/baseController";
 import { CommentsService } from "./comments.service";
 import { HttpStatusCode } from "@/lib/httpStatus";
+import { Types } from "mongoose";
 
 class Controller extends BaseController {
   create = this.catchAsync(async (req, res) => {
@@ -13,7 +14,23 @@ class Controller extends BaseController {
     this.sendResponse(req, res, {
       statusCode: HttpStatusCode.CREATED,
       success: true,
-      message: "Your comment has need post successfully",
+      message: "Your comment has been post successfully",
+      data: result,
+    });
+  });
+
+  update = this.catchAsync(async (req, res) => {
+    const id = req.params.id as unknown as Types.ObjectId;
+    const result = await CommentsService.update(
+      id,
+      req.user.id,
+      req.body.content
+    );
+
+    this.sendResponse(req, res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "Comment has been updated successfully",
       data: result,
     });
   });
