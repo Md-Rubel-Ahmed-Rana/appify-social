@@ -11,7 +11,7 @@ router
   .get(CommentsController.getCommentsByPost);
 
 router
-  .route("/")
+  .route("/:id")
   .patch(validateRequest(CommentValidations.update), CommentsController.update)
   .delete(CommentsController.delete);
 
