@@ -8,6 +8,8 @@ import { PostValidations } from "./posts.validate";
 
 const router = Router();
 
+router.get("/author", PostsController.getPostsByAuthor);
+
 router
   .route("/")
   .post(createPostLimiter, upload.single("image"), PostsController.create)

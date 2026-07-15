@@ -133,6 +133,91 @@ class Service {
     };
   }
 
+  async getPostsByAuthor(
+    options: IPaginationOptions,
+    authorId: Types.ObjectId
+  ) {
+    const {
+      limit = 10,
+      cursor,
+      sort_by = "_id",
+      sort_order = "desc",
+    } = options;
+
+    const safeLimit = calculatePageSize(limit);
+
+    const filter: QueryFilter<IPost> = {
+      author_id: authorId,
+    };
+
+    if (cursor) {
+      filter._id = {
+        $lt: new Types.ObjectId(cursor),
+      };
+    }
+
+    const posts = await PostModel.find(filter)
+      .sort({
+        [sort_by]: sort_order === "asc" ? 1 : -1,
+      })
+      .limit(safeLimit)
+      .populate({
+        path: "author_id",
+        select: "first_name last_name avatar_id",
+        populate: {
+          path: "avatar_id",
+          select: "url",
+        },
+      })
+      .populate({
+        path: "image_id",
+        select: "url width height mime_type",
+      })
+      .lean();
+
+    if (!posts.length) {
+      return {
+        meta: {
+          page_size: safeLimit,
+          next_cursor: null,
+          has_more: false,
+        },
+        posts: [],
+      };
+    }
+
+    const nextCursor =
+      posts.length === safeLimit
+        ? posts[posts.length - 1]._id.toString()
+        : null;
+
+    const postsDto = posts.map(this.toFeedPostDto);
+    const postIds = posts.map((post) => post._id);
+    const currentUserLikes = await LikesService.getLikesByUserForTargets(
+      authorId,
+      LikeTargetType.POST,
+      postIds
+    );
+
+    const likedPostIds = new Set(
+      currentUserLikes.map((like) => like.target_id.toString())
+    );
+
+    return {
+      meta: {
+        page_size: safeLimit,
+        post_count: postsDto.length,
+        next_cursor: nextCursor,
+        has_more: !!nextCursor,
+      },
+      posts: postsDto.map((post) => ({
+        ...post,
+        is_liked: likedPostIds.has(post.id.toString()),
+        is_owner: authorId.toString() === post.author.id.toString(),
+      })),
+    };
+  }
+
   async updatePost(
     id: Types.ObjectId,
     authorId: Types.ObjectId,
