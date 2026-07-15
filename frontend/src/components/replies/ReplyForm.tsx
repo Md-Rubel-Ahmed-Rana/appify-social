@@ -52,6 +52,7 @@ const ReplyForm = ({ reply, onCancel, comment_id }: Props) => {
     }
 
     reset();
+    onCancel();
   };
 
   return (

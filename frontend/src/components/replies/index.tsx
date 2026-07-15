@@ -15,7 +15,7 @@ type Props = {
 
 const Replies = ({ comment_id }: Props) => {
   const [replyingTo, setReplyingTo] = useState<Reply | null>(null);
-  const { data, isLoading, isFetching, isError, refetch } = useGetRepliesQuery({
+  const { data, isLoading, isError, refetch } = useGetRepliesQuery({
     comment_id,
   });
 
@@ -39,7 +39,7 @@ const Replies = ({ comment_id }: Props) => {
 
   const rootReplies = repliesByParent.get(null) ?? [];
 
-  if (isLoading || isFetching) {
+  if (isLoading) {
     return <ReplySkeleton />;
   }
 
