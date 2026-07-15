@@ -8,7 +8,7 @@ import {
 import { randomUUID } from "crypto";
 import path from "path";
 import sharp from "sharp";
-import { FileUploadResponse } from "./uploader.interface";
+import { FileUploadResponse } from "./s3.interface";
 import ApiError from "@/middlewares/error";
 import { HttpStatusCode } from "@/lib/httpStatus";
 
@@ -105,21 +105,6 @@ class Service {
     }
   }
 
-  private extractS3KeyFromUrl(url: string): string {
-    try {
-      const parsedUrl = new URL(url);
-      if (!parsedUrl.href.startsWith(this.uploadBaseUrl)) {
-        throw new Error("Invalid S3 URL: does not match base URL");
-      }
-
-      return parsedUrl.pathname
-        .replace(/^\//, "")
-        .replace(this.uploadBaseUrl.replace(/^https?:\/\//, "") + "/", "");
-    } catch {
-      throw new Error(`Invalid URL: ${url}`);
-    }
-  }
-
   async uploadSingleFile(
     file: Express.Multer.File,
     folder: string
@@ -137,15 +122,13 @@ class Service {
     return await Promise.all(uploadPromises);
   }
 
-  async deleteSingleFile(url: string) {
-    const key = this.extractS3KeyFromUrl(url);
-    await this.deleteFileFromS3(key);
+  async deleteSingleFile(public_id: string) {
+    await this.deleteFileFromS3(public_id);
   }
 
-  async deleteMultipleFiles(urls: string[]) {
-    const keys = urls.map((url) => this.extractS3KeyFromUrl(url));
-    await this.deleteMultipleFilesFromS3(keys);
+  async deleteMultipleFiles(public_ids: string[]) {
+    await this.deleteMultipleFilesFromS3(public_ids);
   }
 }
 
-export const AWSFileUploader = new Service();
+export const S3Service = new Service();

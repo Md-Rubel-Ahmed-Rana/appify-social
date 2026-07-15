@@ -1,6 +1,6 @@
 import mongoose, { QueryFilter, Types } from "mongoose";
 import { IPaginationOptions } from "@/interfaces/pagination.interfaces";
-import { AWSFileUploader } from "../aws/uploader";
+import { S3Service } from "../aws/s3.service";
 import { MediaOwnerType } from "../media/media.interface";
 import { MediaService } from "../media/media.service";
 import { FeedPostDto, IPost, Visibility } from "./posts.interface";
@@ -32,10 +32,7 @@ class Service {
     const post = await PostModel.create(data);
 
     if (file) {
-      const upload = await AWSFileUploader.uploadSingleFile(
-        file,
-        "posts/images"
-      );
+      const upload = await S3Service.uploadSingleFile(file, "posts/images");
 
       const media = await MediaService.create({
         ...upload,
