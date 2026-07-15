@@ -16,8 +16,9 @@ export type Post = {
   content: string;
   created_at: string;
   image: PostImage;
-  is_liked: false;
-  is_owner: false;
+  is_liked: boolean;
+  is_public: boolean;
+  is_owner: boolean;
   comment_count: number;
   like_count: number;
 };

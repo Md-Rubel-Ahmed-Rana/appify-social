@@ -14,6 +14,7 @@ import { useDeletePostMutation } from '@/api/posts';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import EditPostModal from './EditPostModal';
+import PostVisibilityToggle from './PostVisibilityToggle';
 
 type Props = {
   post: Post;
@@ -55,23 +56,29 @@ const PostOwnerActions = ({ post }: Props) => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-48">
-          {post.is_owner && (
-            <>
-              <DropdownMenuItem onClick={() => setIsEdit(true)}>
-                <Pencil className="mr-2 size-4" />
-                Edit Post
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleDeletePost}
-                className="text-destructive focus:text-destructive"
-                disabled={isLoading}
-              >
-                <Trash2 className="mr-2 size-4" />
-                {isLoading ? 'Deleting...' : 'Delete Post'}
-              </DropdownMenuItem>
-            </>
-          )}
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => setIsEdit(true)}
+          >
+            <Pencil className="mr-2 size-4" />
+            Edit Post
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="cursor-pointer">
+            <PostVisibilityToggle
+              is_public={post.is_public}
+              post_id={post.id}
+            />
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={handleDeletePost}
+            className="text-destructive focus:text-destructive cursor-pointer"
+            disabled={isLoading}
+          >
+            <Trash2 className="mr-2 size-4" />
+            {isLoading ? 'Deleting...' : 'Delete Post'}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
