@@ -1,0 +1,36 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "backend",
+    "feat/comment-api-design",
+    "feat/comments-ui-design-api-integrations",
+    "feat/feed-posts-ui-design",
+    "feat/likes-api-design-completed",
+    "feat/likes-api-integration",
+    "frontend",
+    "main",
+    "origin"
+  ],
+  "parent": {
+    "backend": "main",
+    "feat/comment-api-design": "main",
+    "feat/comments-ui-design-api-integrations": "main",
+    "feat/feed-posts-ui-design": "main",
+    "feat/likes-api-design-completed": "main",
+    "feat/likes-api-integration": "main",
+    "frontend": "main",
+    "main": null,
+    "origin": "main"
+  },
+  "order": [
+    "main",
+    "backend",
+    "feat/comment-api-design",
+    "feat/comments-ui-design-api-integrations",
+    "feat/feed-posts-ui-design",
+    "feat/likes-api-design-completed",
+    "feat/likes-api-integration",
+    "frontend",
+    "origin"
+  ]
+}

@@ -382,9 +382,9 @@ The application uses **MongoDB** as its primary database and follows a normalize
 
 # 📊 Entity Relationship Diagram (ERD)
 
-> **ERD Diagram:** https://your-erd-diagram-link.com
+> **ERD Diagram:** https://dbdiagram.io/d/Appify-Social-Platform-ERD-Diagram-69e39813a5db712fe585ba8d
 
-> Replace the placeholder above with your final ERD diagram before submission.
+![ERD-Database-desig](./screenshots/ERD-Database-design.png)
 
 ---
 
