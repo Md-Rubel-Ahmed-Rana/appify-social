@@ -43,6 +43,14 @@ const postApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['posts'],
     }),
+
+    toggleVisibility: build.mutation({
+      query: ({ post_id }: { post_id: string }) => ({
+        url: `/posts/${post_id}/toggle-visibility`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: ['posts'],
+    }),
   }),
 });
 
@@ -54,4 +62,5 @@ export const {
   useEditPostMutation,
   useGetPostsByAuthorQuery,
   useLazyGetPostsByAuthorQuery,
+  useToggleVisibilityMutation,
 } = postApi;
