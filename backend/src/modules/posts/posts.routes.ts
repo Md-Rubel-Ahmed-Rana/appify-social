@@ -20,4 +20,6 @@ router
   .patch(validateRequest(PostValidations.update), PostsController.updatePost)
   .delete(PostsController.delete);
 
+router.patch("/:id/toggle-visibility", PostsController.toggleVisibility);
+
 export const PostsRoutes = router;

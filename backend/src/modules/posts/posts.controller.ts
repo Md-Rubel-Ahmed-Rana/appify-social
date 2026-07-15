@@ -87,6 +87,18 @@ class Controller extends BaseController {
     });
   });
 
+  toggleVisibility = this.catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id as unknown as Types.ObjectId;
+    const { visibility } = await PostsService.toggleVisibility(id, req.user.id);
+
+    this.sendResponse(req, res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: `Post visibility updated to "${visibility}" successfully`,
+      data: null,
+    });
+  });
+
   delete = this.catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as unknown as Types.ObjectId;
     const result = await PostsService.delete(id, req.user.id);
