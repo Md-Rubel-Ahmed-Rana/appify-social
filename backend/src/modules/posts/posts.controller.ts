@@ -53,41 +53,6 @@ class Controller extends BaseController {
     });
   });
 
-  getLikesByPost = this.catchAsync(async (req: Request, res: Response) => {
-    const id = req.params.id as unknown as Types.ObjectId;
-    const result = await PostsService.getLikesByPost(id);
-    this.sendResponse(req, res, {
-      statusCode: HttpStatusCode.OK,
-      success: true,
-      message: "Post likes retrieved successfully",
-      data: result,
-    });
-  });
-
-  getCommentsByPost = this.catchAsync(async (req: Request, res: Response) => {
-    const id = req.params.id as unknown as Types.ObjectId;
-    const options = pickQueries(req.query, paginationFields);
-    const result = await PostsService.getCommentsByPost(
-      id,
-      req.user.id,
-      options
-    );
-
-    this.sendResponse(req, res, {
-      statusCode: HttpStatusCode.OK,
-      success: true,
-      message: "Post's comments retrieved successfully",
-      data: {
-        current_user: {
-          id: req.user.id,
-          first_name: req.user.first_name,
-          last_name: req.user.last_name,
-        },
-        ...result,
-      },
-    });
-  });
-
   updatePost = this.catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as unknown as Types.ObjectId;
     const result = await PostsService.updatePost(

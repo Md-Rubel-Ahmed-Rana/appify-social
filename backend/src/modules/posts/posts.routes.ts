@@ -18,8 +18,4 @@ router
   .patch(validateRequest(PostValidations.update), PostsController.updatePost)
   .delete(PostsController.delete);
 
-router.get("/:id/likes", PostsController.getLikesByPost);
-
-router.get("/:id/comments", PostsController.getCommentsByPost);
-
 export const PostsRoutes = router;

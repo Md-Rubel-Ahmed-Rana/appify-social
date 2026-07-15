@@ -5,18 +5,14 @@ import { CommentValidations } from "./comments.validate";
 
 const router = Router();
 
-router.post(
-  "/",
-  validateRequest(CommentValidations.create),
-  CommentsController.create
-);
+router
+  .route("/")
+  .post(validateRequest(CommentValidations.create), CommentsController.create)
+  .get(CommentsController.getCommentsByPost);
 
-router.patch(
-  "/:id",
-  validateRequest(CommentValidations.update),
-  CommentsController.update
-);
-
-router.delete("/:id", CommentsController.delete);
+router
+  .route("/")
+  .patch(validateRequest(CommentValidations.update), CommentsController.update)
+  .delete(CommentsController.delete);
 
 export const CommentsRoutes = router;

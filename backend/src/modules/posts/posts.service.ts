@@ -10,7 +10,6 @@ import { LikeTargetType } from "../likes/likes.interface";
 import { sanitizePostContent } from "@/utils/sanitize";
 import ApiError from "@/middlewares/error";
 import { HttpStatusCode } from "@/lib/httpStatus";
-import { CommentsService } from "../comments/comments.service";
 import { calculatePageSize } from "@/utils/calculatePageSize";
 import { CommentModel } from "../comments/comments.model";
 import { LikeModel } from "../likes/likes.model";
@@ -132,28 +131,6 @@ class Service {
         is_owner: userId.toString() === post.author.id.toString(),
       })),
     };
-  }
-
-  async getLikesByPost(id: Types.ObjectId) {
-    const post = await PostModel.findById(id);
-    if (!post) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "Post was not found");
-    }
-
-    return await LikesService.getLikeByTargetResource(id);
-  }
-
-  async getCommentsByPost(
-    id: Types.ObjectId,
-    userId: Types.ObjectId,
-    options: IPaginationOptions
-  ) {
-    const post = await PostModel.findById(id).lean();
-    if (!post) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "Post was not found");
-    }
-
-    return await CommentsService.getCommentsByPost(id, userId, options);
   }
 
   async updatePost(
