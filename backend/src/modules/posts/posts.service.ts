@@ -256,6 +256,33 @@ class Service {
     }
   }
 
+  async toggleVisibility(id: Types.ObjectId, authorId: Types.ObjectId) {
+    const post = await PostModel.findOne({
+      _id: id,
+      author_id: authorId,
+    });
+
+    if (!post) {
+      throw new ApiError(
+        HttpStatusCode.NOT_FOUND,
+        "Post not found or your are not authorized to perform action."
+      );
+    }
+
+    const visibility =
+      post.visibility === Visibility.PRIVATE
+        ? Visibility.PUBLIC
+        : Visibility.PRIVATE;
+
+    post.visibility = visibility;
+
+    await post.save();
+
+    return {
+      visibility,
+    };
+  }
+
   // ======== Note ========
   /*
     Right now, I intentionally performing all the operation at once with MongoDB ACID Operation
@@ -390,6 +417,8 @@ class Service {
       created_at: post.created_at,
 
       like_count: post.like_count,
+
+      is_public: post.visibility === Visibility.PUBLIC ? true : false,
 
       comment_count: post.comment_count,
 

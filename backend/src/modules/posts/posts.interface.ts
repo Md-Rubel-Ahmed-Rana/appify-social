@@ -35,6 +35,12 @@ export interface FeedPostDto {
 
   like_count: number;
 
+  is_public: boolean;
+
+  is_liked?: boolean;
+
+  is_owner?: boolean;
+
   comment_count: number;
 
   author: {
