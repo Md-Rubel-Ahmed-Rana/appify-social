@@ -196,7 +196,7 @@ class Service {
 
   // ======== Note ========
   /*
-    Right now, I intentionally perform all the operation at once with MongoDB ACID Operation
+    Right now, I intentionally performing all the operation at once with MongoDB ACID Operation
     But, for a production application, I always prefer to use background job to perform cascading deletion for very large dataset
   */
   async delete(id: Types.ObjectId, authorId: Types.ObjectId) {
@@ -288,6 +288,15 @@ class Service {
       );
 
       await Promise.all(deleteOperations);
+
+      // Delete the media as well
+      if (post.image_id) {
+        await MediaService.delete(
+          post.image_id as Types.ObjectId,
+          MediaOwnerType.POST,
+          session
+        );
+      }
 
       await post.deleteOne({ session });
 
