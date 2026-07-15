@@ -418,6 +418,8 @@ class Service {
 
       like_count: post.like_count,
 
+      is_public: post.visibility === Visibility.PUBLIC ? true : false,
+
       comment_count: post.comment_count,
 
       author: {
