@@ -11,7 +11,7 @@ const likeApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['posts'],
+      invalidatesTags: ['posts', 'comments', 'replies'],
     }),
 
     getLikes: build.query({
@@ -36,7 +36,7 @@ const likeApi = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: data,
       }),
-      invalidatesTags: ['posts'],
+      invalidatesTags: ['posts', 'comments', 'replies'],
     }),
   }),
 });

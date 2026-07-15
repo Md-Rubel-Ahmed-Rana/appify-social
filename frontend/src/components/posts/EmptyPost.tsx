@@ -1,6 +1,6 @@
 import { FileText } from 'lucide-react';
 
-const EmptyFeed = () => {
+const EmptyPost = () => {
   return (
     <div className="rounded-xl border bg-card p-12 text-center">
       <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
@@ -17,4 +17,4 @@ const EmptyFeed = () => {
   );
 };
 
-export default EmptyFeed;
+export default EmptyPost;

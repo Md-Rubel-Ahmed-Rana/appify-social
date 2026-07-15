@@ -22,16 +22,15 @@ type Props = {
 };
 
 const CommentsDrawer = ({ open, setOpen, post_id }: Props) => {
-  const { data, isLoading, isFetching, isError, refetch } =
-    useGetCommentsByPostQuery(
-      {
-        next_cursor: '',
-        postId: post_id,
-      },
-      {
-        skip: !open,
-      },
-    );
+  const { data, isLoading, isError, refetch } = useGetCommentsByPostQuery(
+    {
+      next_cursor: '',
+      postId: post_id,
+    },
+    {
+      skip: !open,
+    },
+  );
 
   const comments = (data?.data?.comments ?? []) as Comment[];
 
@@ -45,7 +44,7 @@ const CommentsDrawer = ({ open, setOpen, post_id }: Props) => {
         </DrawerHeader>
 
         <div className="flex-1 overflow-y-auto p-4">
-          {isLoading || isFetching ? (
+          {isLoading ? (
             <CommentsSkeleton />
           ) : isError ? (
             <CommentsError onRetry={refetch} />

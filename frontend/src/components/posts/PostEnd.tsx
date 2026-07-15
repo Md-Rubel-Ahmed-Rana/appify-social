@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react';
 
-const FeedEnd = () => {
+const PostEnd = () => {
   return (
     <div className="flex items-center justify-center gap-3 py-8">
       <div className="h-px flex-1 bg-border" />
@@ -15,4 +15,4 @@ const FeedEnd = () => {
   );
 };
 
-export default FeedEnd;
+export default PostEnd;

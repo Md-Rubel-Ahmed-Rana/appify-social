@@ -1,26 +1,21 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Search, SquarePlus } from "lucide-react";
-
-import { useMemo, useState } from "react";
-
-import { useGetUserProfileQuery } from "@/api/auth";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-
+import Link from 'next/link';
+import { SquarePlus } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useGetUserProfileQuery } from '@/api/auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Image from "next/image";
-import LogoutButton from "../common/logout-button";
-import { User } from "@/types/user.type";
-import CreatePostModal from "../create-post";
+} from '@/components/ui/dropdown-menu';
+import Image from 'next/image';
+import LogoutButton from '../common/logout-button';
+import { User } from '@/types/user.type';
+import CreatePostModal from '../create-post';
 
 const Navbar = () => {
   const [isCreatePost, setIsCreatePost] = useState(false);
@@ -29,18 +24,18 @@ const Navbar = () => {
   const user = data?.data as User;
 
   const initials = useMemo(() => {
-    if (!user) return "U";
+    if (!user) return 'U';
 
-    return `${user.first_name[0] ?? ""}${user.last_name[0] ?? ""}`.toUpperCase();
+    return `${user.first_name[0] ?? ''}${user.last_name[0] ?? ''}`.toUpperCase();
   }, [user]);
 
   return (
     <>
       <header className="sticky top-0 z-50 border-b bg-white/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 lg:px-6 px-2">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 lg:px-6 px-2">
           <Link href="/" className="flex shrink-0 items-center gap-2">
             <Image
-              src={"/images/logo.png"}
+              src={'/images/logo.png'}
               alt="Logo"
               width={32}
               height={32}
@@ -49,17 +44,6 @@ const Navbar = () => {
 
             <span className="text-lg font-semibold">Appify Social</span>
           </Link>
-
-          <div className="flex flex-1 justify-center">
-            <div className="relative w-full max-w-xl">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                size={18}
-              />
-
-              <Input placeholder="Search ..." className="pl-10" />
-            </div>
-          </div>
 
           <div className="flex items-center gap-2">
             <button
@@ -80,7 +64,7 @@ const Navbar = () => {
                 <DropdownMenuTrigger>
                   <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.avatar_url ?? ""} />
+                      <AvatarImage src={user.avatar_url ?? ''} />
 
                       <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
@@ -100,8 +84,11 @@ const Navbar = () => {
 
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuItem>My Posts</DropdownMenuItem>
+                  <Link href={'/profile/posts'}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      My Posts
+                    </DropdownMenuItem>
+                  </Link>
 
                   <DropdownMenuSeparator />
 
