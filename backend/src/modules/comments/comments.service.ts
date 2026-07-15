@@ -141,6 +141,10 @@ class Service {
     userId: Types.ObjectId,
     options: IPaginationOptions
   ) {
+    if (!postId?.toString()?.trim()) {
+      throw new ApiError(HttpStatusCode.BAD_REQUEST, "Post id is required");
+    }
+
     const { limit = 10, cursor } = options;
 
     const safeLimit = calculatePageSize(limit);

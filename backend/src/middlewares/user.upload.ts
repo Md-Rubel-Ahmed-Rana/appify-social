@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import ApiError from "./error";
 import { HttpStatusCode } from "@/lib/httpStatus";
-import { AWSFileUploader } from "@/modules/aws/uploader";
+import { S3Service } from "@/modules/aws/s3.service";
 import { MediaService } from "@/modules/media/media.service";
 import { MediaOwnerType } from "@/modules/media/media.interface";
 
@@ -27,14 +27,13 @@ class Middleware {
         )
       );
     }
-    console.log(file);
 
     if (!file) {
       return next();
     }
 
     try {
-      const upload = await AWSFileUploader.uploadSingleFile(file, "avatars");
+      const upload = await S3Service.uploadSingleFile(file, "avatars");
 
       const mediaResponse = await MediaService.create({
         ...upload,

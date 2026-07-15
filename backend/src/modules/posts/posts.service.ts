@@ -1,6 +1,6 @@
 import mongoose, { QueryFilter, Types } from "mongoose";
 import { IPaginationOptions } from "@/interfaces/pagination.interfaces";
-import { AWSFileUploader } from "../aws/uploader";
+import { S3Service } from "../aws/s3.service";
 import { MediaOwnerType } from "../media/media.interface";
 import { MediaService } from "../media/media.service";
 import { FeedPostDto, IPost, Visibility } from "./posts.interface";
@@ -10,7 +10,6 @@ import { LikeTargetType } from "../likes/likes.interface";
 import { sanitizePostContent } from "@/utils/sanitize";
 import ApiError from "@/middlewares/error";
 import { HttpStatusCode } from "@/lib/httpStatus";
-import { CommentsService } from "../comments/comments.service";
 import { calculatePageSize } from "@/utils/calculatePageSize";
 import { CommentModel } from "../comments/comments.model";
 import { LikeModel } from "../likes/likes.model";
@@ -32,10 +31,7 @@ class Service {
     const post = await PostModel.create(data);
 
     if (file) {
-      const upload = await AWSFileUploader.uploadSingleFile(
-        file,
-        "posts/images"
-      );
+      const upload = await S3Service.uploadSingleFile(file, "posts/images");
 
       const media = await MediaService.create({
         ...upload,
@@ -137,26 +133,89 @@ class Service {
     };
   }
 
-  async getLikesByPost(id: Types.ObjectId) {
-    const post = await PostModel.findById(id);
-    if (!post) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "Post was not found");
-    }
-
-    return await LikesService.getLikeByTargetResource(id);
-  }
-
-  async getCommentsByPost(
-    id: Types.ObjectId,
-    userId: Types.ObjectId,
-    options: IPaginationOptions
+  async getPostsByAuthor(
+    options: IPaginationOptions,
+    authorId: Types.ObjectId
   ) {
-    const post = await PostModel.findById(id).lean();
-    if (!post) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "Post was not found");
+    const {
+      limit = 10,
+      cursor,
+      sort_by = "_id",
+      sort_order = "desc",
+    } = options;
+
+    const safeLimit = calculatePageSize(limit);
+
+    const filter: QueryFilter<IPost> = {
+      author_id: authorId,
+    };
+
+    if (cursor) {
+      filter._id = {
+        $lt: new Types.ObjectId(cursor),
+      };
     }
 
-    return await CommentsService.getCommentsByPost(id, userId, options);
+    const posts = await PostModel.find(filter)
+      .sort({
+        [sort_by]: sort_order === "asc" ? 1 : -1,
+      })
+      .limit(safeLimit)
+      .populate({
+        path: "author_id",
+        select: "first_name last_name avatar_id",
+        populate: {
+          path: "avatar_id",
+          select: "url",
+        },
+      })
+      .populate({
+        path: "image_id",
+        select: "url width height mime_type",
+      })
+      .lean();
+
+    if (!posts.length) {
+      return {
+        meta: {
+          page_size: safeLimit,
+          next_cursor: null,
+          has_more: false,
+        },
+        posts: [],
+      };
+    }
+
+    const nextCursor =
+      posts.length === safeLimit
+        ? posts[posts.length - 1]._id.toString()
+        : null;
+
+    const postsDto = posts.map(this.toFeedPostDto);
+    const postIds = posts.map((post) => post._id);
+    const currentUserLikes = await LikesService.getLikesByUserForTargets(
+      authorId,
+      LikeTargetType.POST,
+      postIds
+    );
+
+    const likedPostIds = new Set(
+      currentUserLikes.map((like) => like.target_id.toString())
+    );
+
+    return {
+      meta: {
+        page_size: safeLimit,
+        post_count: postsDto.length,
+        next_cursor: nextCursor,
+        has_more: !!nextCursor,
+      },
+      posts: postsDto.map((post) => ({
+        ...post,
+        is_liked: likedPostIds.has(post.id.toString()),
+        is_owner: authorId.toString() === post.author.id.toString(),
+      })),
+    };
   }
 
   async updatePost(
@@ -199,7 +258,7 @@ class Service {
 
   // ======== Note ========
   /*
-    Right now, I intentionally perform all the operation at once with MongoDB ACID Operation
+    Right now, I intentionally performing all the operation at once with MongoDB ACID Operation
     But, for a production application, I always prefer to use background job to perform cascading deletion for very large dataset
   */
   async delete(id: Types.ObjectId, authorId: Types.ObjectId) {
@@ -291,6 +350,15 @@ class Service {
       );
 
       await Promise.all(deleteOperations);
+
+      // Delete the media as well
+      if (post.image_id) {
+        await MediaService.delete(
+          post.image_id as Types.ObjectId,
+          MediaOwnerType.POST,
+          session
+        );
+      }
 
       await post.deleteOne({ session });
 
