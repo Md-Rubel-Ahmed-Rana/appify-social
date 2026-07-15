@@ -18,9 +18,11 @@ const postApi = apiSlice.injectEndpoints({
       providesTags: ['posts'],
     }),
 
-    getLikesByPost: build.query({
-      query: ({ post_id }: { post_id: string }) => ({
-        url: `/posts/${post_id}/likes`,
+    getPostsByAuthor: build.query({
+      query: ({ nextCursor }: { nextCursor?: string | null } = {}) => ({
+        url: nextCursor
+          ? `/posts/author?cursor=${nextCursor}`
+          : '/posts/author',
       }),
       providesTags: ['posts'],
     }),
@@ -48,7 +50,7 @@ export const {
   usePublishPostMutation,
   useFeedPostsQuery,
   useLazyFeedPostsQuery,
-  useGetLikesByPostQuery,
   useDeletePostMutation,
   useEditPostMutation,
+  useGetPostsByAuthorQuery,
 } = postApi;

@@ -11,8 +11,8 @@ const commentApi = apiSlice.injectEndpoints({
         postId: string;
       }) => ({
         url: next_cursor
-          ? `/posts/${postId}/comments/?cursor=${next_cursor}`
-          : `/posts/${postId}/comments`,
+          ? `/comments?post_id=${postId}&cursor=${next_cursor}`
+          : `/comments?post_id=${postId}`,
       }),
       providesTags: ['comments', 'posts'],
     }),
