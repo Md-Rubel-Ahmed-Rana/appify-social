@@ -53,4 +53,5 @@ export const {
   useDeletePostMutation,
   useEditPostMutation,
   useGetPostsByAuthorQuery,
+  useLazyGetPostsByAuthorQuery,
 } = postApi;

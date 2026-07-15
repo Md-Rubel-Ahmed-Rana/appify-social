@@ -1,4 +1,4 @@
-import CreatePostCard from './CreatePostCard';
+import CreatePostCard from '../posts/CreatePostCard';
 import FeedPosts from './FeedPosts';
 
 const Feed = () => {

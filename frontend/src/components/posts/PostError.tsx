@@ -7,7 +7,7 @@ type Props = {
   onRetry: () => void;
 };
 
-const FeedError = ({ onRetry }: Props) => {
+const PostError = ({ onRetry }: Props) => {
   return (
     <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-10 text-center">
       <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
@@ -28,4 +28,4 @@ const FeedError = ({ onRetry }: Props) => {
   );
 };
 
-export default FeedError;
+export default PostError;

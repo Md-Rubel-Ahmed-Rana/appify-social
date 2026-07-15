@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { envConfig } from "./config";
+import { NextRequest, NextResponse } from 'next/server';
+import { envConfig } from './config';
 
 const ACCESS_COOKIE_NAME = envConfig.access_token_name;
 const REFRESH_COOKIE_NAME = envConfig.refresh_token_name;
@@ -12,20 +12,23 @@ export default function proxy(req: NextRequest) {
 
   const isAuthenticated = Boolean(accessToken || refreshToken);
 
-  const isPrivateRoute = pathname === "/" || pathname.startsWith("/feed");
+  const isPrivateRoute =
+    pathname === '/' ||
+    pathname.startsWith('/feed') ||
+    pathname.startsWith('/profile');
 
-  const isAuthRoute = pathname === "/signin" || pathname === "/signup";
+  const isAuthRoute = pathname === '/signin' || pathname === '/signup';
 
   if (isPrivateRoute && !isAuthenticated) {
-    const loginUrl = new URL("/signin", req.url);
+    const loginUrl = new URL('/signin', req.url);
 
-    loginUrl.searchParams.set("redirect", `${pathname}${search}`);
+    loginUrl.searchParams.set('redirect', `${pathname}${search}`);
 
     return NextResponse.redirect(loginUrl);
   }
 
   if (isAuthRoute && isAuthenticated) {
-    const redirect = req.nextUrl.searchParams.get("redirect") || "/";
+    const redirect = req.nextUrl.searchParams.get('redirect') || '/';
 
     return NextResponse.redirect(new URL(redirect, req.url));
   }
@@ -34,5 +37,5 @@ export default function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/feed/:path*", "/signin", "/signup"],
+  matcher: ['/', '/feed/:path*', '/profile/:path*', '/signin', '/signup'],
 };
