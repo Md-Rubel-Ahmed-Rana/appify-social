@@ -23,7 +23,7 @@ The project was designed with a strong focus on:
 | Backend API       | https://api-appify-social.mdrubelahmedrana.com                                     |
 | API Documentation | https://documenter.getpostman.com/view/46201161/2sBY4Mv29R                         |
 | ERD Diagram       | https://dbdiagram.io/d/Appify-Social-Platform-ERD-Diagram-69e39813a5db712fe585ba8d |
-| Video Walkthrough | https://youtube.com/watch?v=[video url will be added after uploading]              |
+| Video Walkthrough | https://www.youtube.com/watch?v=8kbDp3T2Qow                                        |
 
 ---
 
@@ -1231,7 +1231,7 @@ Add screenshots demonstrating the following pages:
 
 A complete walkthrough of the project can be found here:
 
-![Video Link](Link will be added here after uploading)
+![Video Link](https://www.youtube.com/watch?v=8kbDp3T2Qow)
 
 The walkthrough demonstrates:
 
