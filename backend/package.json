@@ -27,10 +27,10 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "dev": "node api.js && ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
-    "build": "node api.js && tsc && tsc-alias",
-    "start": "node api.js && node -r tsconfig-paths/register dist/server.js",
-    "start:prod": "NODE_ENV=production node dist/server.js",
+    "dev": "node init && ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
+    "build": "node init && tsc && tsc-alias",
+    "start": "node init && node -r tsconfig-paths/register dist/server.js",
+    "start:prod": "node init && NODE_ENV=production node dist/server.js",
     "clean": "rimraf dist",
     "rebuild": "npm run clean && npm run build",
     "type-check": "tsc --noEmit",
